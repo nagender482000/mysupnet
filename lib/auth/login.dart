@@ -3,7 +3,6 @@ import 'package:mysupnet/Apicalls/log.dart';
 import 'package:mysupnet/auth/forgot.dart';
 import 'package:mysupnet/auth/signup.dart';
 import 'package:mysupnet/fadetransition.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -206,7 +205,6 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 );
                               });
-                          print("clicked");
                           // SharedPreferences prefs =
                           //     await SharedPreferences.getInstance();
                           // String token = prefs.getString('token').toString();
