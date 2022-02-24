@@ -1,0 +1,680 @@
+// ignore_for_file: deprecated_member_use
+
+import 'dart:convert';
+
+import "package:flutter/material.dart";
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:mysupnet/Apicalls/likeapi.dart';
+import 'package:mysupnet/drawer.dart';
+import 'package:mysupnet/home/comments.dart';
+import 'package:mysupnet/home/newpost.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+class HomeFeedPage extends StatefulWidget {
+  const HomeFeedPage({Key? key}) : super(key: key);
+
+  @override
+  _HomeFeedPageState createState() => _HomeFeedPageState();
+}
+
+class _HomeFeedPageState extends State<HomeFeedPage> {
+  final searchController = TextEditingController();
+  final commentController = TextEditingController();
+  bool isloading = true;
+  List postdata = [];
+  List<dynamic> commentdata = [];
+  String name = "";
+  Map<dynamic, dynamic> postdatamap = {};
+
+  //int bookmarkbuttonclick = 0;
+  void showWidget(String id) {
+    setState(() {
+      postdatamap[id]["isvisible"] = true;
+    });
+  }
+
+  void hideWidget(String id) async {
+    await postlist();
+
+    setState(() {
+      postdatamap[id]["isvisible"] = false;
+    });
+  }
+
+  postlist() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token').toString();
+    name = prefs.getString('name').toString();
+    var headers = {
+      'Authorization':
+          // 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQyMzg0NjUwLCJpYXQiOjE2NDEwODg2NTAsImp0aSI6IjBhZjQxMjlkNjU0NjQ4YmFiMWE4ZTAxMmM3MGUzZWUxIiwidXNlcl9pZCI6NDcsIm5hbWUiOiJkZWVwaWthYSBzdWJyYW1hbmlhbSIsInN1cHBvcnRfZ3JvdXBfaWQiOjMsInN1cHBvcnRfZ3JvdXBfbmFtZSI6Imdyb3VwMTAiLCJpc19zdXBlcl9hZG1pbiI6ZmFsc2UsImlzX2FkbWluX3VzZXIiOnRydWV9.YZcUWPvRBBHMN75YPCN27oI5efWwIA0ysY73cZ_GS_A'
+          'Bearer ' + token.toString(),
+    };
+    var request = http.MultipartRequest(
+        'GET', Uri.parse('https://apis.mysupnet.org/api/v1/post/all'));
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+    var responsed = await http.Response.fromStream(response);
+    final responseData = json.decode(responsed.body);
+
+    if (response.statusCode == 200) {
+      postdata = responseData["data"];
+      for (int i = 0; i < postdata.length; i++) {
+        int likes = postdata[i]["likes"];
+        int comments = postdata[i]["comments"].length;
+
+        postdatamap[postdata[i]["uuid"].toString()] = {
+          "isliked": postdata[i]["current_user_has_liked"],
+          "lclickcount": 0,
+          "bclickcount": 0,
+          "isbookmarked": false,
+          "isvisible": false,
+          "likecount": likes,
+          "commentscount": comments,
+          "editvisible": false,
+          "imgvisible": true,
+        };
+      }
+    } else {
+      return responseData["detail"];
+    }
+  }
+
+  // getConditionData() async {
+  //   var request = http.MultipartRequest(
+  //       'GET',
+  //       Uri.parse(
+  //           'https://apis.mysupnet.org/api/v1/supportgroup/disease/list'));
+  //   http.StreamedResponse response = await request.send();
+  //   var responsed = await http.Response.fromStream(response);
+  //   final item = json.decode(responsed.body);
+  //   setState(() {
+  //     isloading = true;
+
+  //     disList.remove("Condition");
+  //     item.forEach((key, value1) {
+  //       disList.add(key);
+  //     });
+  //   });
+  @override
+  void initState() {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ));
+    getpost();
+    super.initState();
+  }
+
+  getpost() async {
+    setState(() {
+      isloading = true;
+    });
+    await postlist();
+    setState(() {
+      isloading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void like(String id) async {
+    await likeapi(context, id, "post");
+
+    setState(() {
+      postdatamap[id]["isliked"] = true;
+    });
+    if (postdatamap[id]["isliked"]) {
+      postdatamap[id]["likecount"] = postdatamap[id]["likecount"] + 1;
+    }
+  }
+
+  void bookmark(String id) {
+    setState(() {
+      postdatamap[id]["isbookmarked"] = !postdatamap[id]["isbookmarked"];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      endDrawer: const NavigationDrawerWidget(),
+      backgroundColor: Colors.white,
+      body: SizedBox(
+        height: size.height * 1.2,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Topbar(size: size, searchController: searchController),
+              const SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                width: size.width,
+                child: Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const AddNewPost(),
+                          ));
+                        },
+                        child: SizedBox(
+                          width: size.width,
+                          height: size.height * 0.1,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                radius: 25,
+                                child: Image.asset("assets/images/user.png"),
+                              ),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Container(
+                                width: size.width * 0.7,
+                                alignment: Alignment.center,
+                                child: TextFormField(
+                                  enabled: false,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                      fontFamily: "Avenir LT Std",
+                                      color: Color(0xFF000000),
+                                      fontSize: 14),
+                                  decoration: const InputDecoration(
+                                    hintText: " |What's on your mind?",
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20.0))),
+                                  ),
+                                  autofocus: false,
+                                  controller: searchController,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              // Flexible(
+                              //   child: Image.asset(
+                              //     "assets/images/Camera.png",
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: size.height * .65,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const ScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: postdata.length,
+                          itemBuilder: (context, index) {
+                            String id = postdata[index]["uuid"].toString();
+                            String psname =
+                                postdata[index]["user_name"].toString();
+                            return Card(
+                                child: Column(children: [
+                              Stack(children: [
+                                post(
+                                  size,
+                                  psname,
+                                  postdata[index]["text"].toString(),
+                                  postdatamap[id]["commentscount"],
+                                  postdatamap[id]["likecount"],
+                                  index,
+                                  TimeAgo.timeAgoSinceDate(
+                                      DateTime.parse(postdata[index]["created"])
+                                          .toString()),
+                                  postdata[index]["user_condition"].toString(),
+                                  postdata[index]["uuid"].toString(),
+                                ),
+                              ])
+                            ]));
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        items: [
+          BottomNavigationBarItem(
+            icon: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const HomeFeedPage(),
+                ));
+              },
+              child: const Image(
+                image: AssetImage("assets/images/feed.png"),
+                color: null,
+              ),
+            ),
+            backgroundColor: null,
+            label: "FEED",
+          ),
+          BottomNavigationBarItem(
+            icon: GestureDetector(
+              child: const Image(
+                image: AssetImage("assets/images/inactivechat.png"),
+                color: null,
+              ),
+            ),
+            label: "MENTORS",
+          ),
+          BottomNavigationBarItem(
+            icon: GestureDetector(
+              child: const Image(
+                image: AssetImage("assets/images/inactivenew.png"),
+                color: null,
+              ),
+            ),
+            label: "WHAT'S NEW",
+          ),
+        ],
+      ),
+    );
+  }
+
+  Center post(Size size, String name, String posttext, int commentscount,
+      int likecount, index, creattime, cond, id) {
+    commentdata.add(postdata[index]["comments"]);
+    // for (int i = 0; i < commentdata.length; i++) {
+    //   if (commentdata.isNotEmpty) {
+    //     commentdatamap[commentdata[0][i]["uuid"]] = {
+    //       "isliked": false,
+    //       "likecount": commentdata[0][i]["likes"],
+    //     };
+    //   }
+    // }
+    //print(commentdatamap);
+    return Center(
+      child: SizedBox(
+        width: size.width * 0.95,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  child: Image.asset("assets/images/user.png"),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontFamily: "Avenir LT Std",
+                        color: Color(0xFF4078A6),
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          cond,
+                          style: const TextStyle(
+                            fontFamily: "Avenir LT Std",
+                            color: Colors.black,
+                            fontSize: 10,
+                          ),
+                        ),
+                        const Text(
+                          "• ",
+                          style: TextStyle(
+                            fontFamily: "Avenir LT Std",
+                            color: Colors.black,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Text(
+                          creattime,
+                          style: const TextStyle(
+                            fontFamily: "Avenir LT Std",
+                            color: Colors.black,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                // GestureDetector(
+                //   onTap: () async {
+                //     SharedPreferences prefs =
+                //         await SharedPreferences.getInstance();
+                //     String creatorid = prefs.getString('id').toString();
+                //   },
+                //   child: GestureDetector(
+                //     onTap: () {
+                //       setState(() {
+                //         postdatamap[id]["editvisible"] = true;
+                //         postdatamap[id]["imgvisible"] = false;
+                //       });
+                //     },
+                //     child: Visibility(
+                //       maintainSize: false,
+                //       maintainAnimation: true,
+                //       maintainState: true,
+                //       visible: postdatamap[id]["imgvisible"],
+                //       child: SizedBox(
+                //           height: size.height * 0.02,
+                //           child: Image.asset("assets/images/edit.png",
+                //               fit: BoxFit.contain)),
+                //     ),
+                //   ),
+                // ),
+                const SizedBox(
+                  width: 20,
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              posttext,
+              style: const TextStyle(
+                fontFamily: "Avenir LT Std",
+                color: Colors.black,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        bottomLeft: Radius.circular(20.0)),
+                    color: Color(0xFFF6F6F6),
+                  ),
+                  height: size.height * 0.04,
+                  width: size.width * 0.15,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          if (postdatamap[id]["lclickcount"] % 2 == 0) {
+                            like(id);
+                          }
+                          postdatamap[id]["lclickcount"] =
+                              postdatamap[id]["lclickcount"] + 1;
+                        },
+                        child: postdatamap[id]["isliked"]
+                            ? const Icon(Icons.favorite, color: Colors.green)
+                            : const Icon(
+                                Icons.favorite_outline,
+                                color: Colors.green,
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  width: 1,
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF6F6F6),
+                  ),
+                  height: size.height * 0.04,
+                  width: size.width * 0.25,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        likecount.toString() + " likes",
+                        style: const TextStyle(
+                          fontFamily: "Avenir LT Std",
+                          color: Color(0xFF4078A6),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  width: 1,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (postdatamap[id]["isvisible"]) {
+                      hideWidget(id);
+                    } else {
+                      showWidget(id);
+                    }
+                  },
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(20.0),
+                          bottomRight: Radius.circular(20.0)),
+                      color: Color(0xFFF6F6F6),
+                    ),
+                    height: size.height * 0.04,
+                    width: size.width * 0.4,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          commentscount.toString() + " comments",
+                          style: const TextStyle(
+                            fontFamily: "Avenir LT Std",
+                            color: Color(0xFF4078A6),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (postdatamap[id]["bclickcount"] % 2 == 0) {
+                      bookmark(id);
+                    }
+                    postdatamap[id]["bclickcount"] =
+                        postdatamap[id]["bclickcount"] + 1;
+                  },
+                  child: postdatamap[id]["isbookmarked"]
+                      ? const Icon(Icons.bookmark, color: Colors.green)
+                      : const Icon(
+                          Icons.bookmark_border_outlined,
+                          color: Colors.green,
+                        ),
+                ),
+              ],
+            ),
+            Visibility(
+              maintainSize: false,
+              maintainAnimation: true,
+              maintainState: true,
+              visible: postdatamap[id]["isvisible"],
+              child: Column(
+                children: [
+                  CommentsSec(
+                    id,
+                    index,
+                    postdata,
+                    postdatamap,
+                    commentdata,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Topbar extends StatelessWidget {
+  const Topbar({
+    Key? key,
+    required this.size,
+    required this.searchController,
+  }) : super(key: key);
+
+  final Size size;
+  final TextEditingController searchController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFFF2F9FF),
+      child: Column(
+        children: [
+          SizedBox(
+            height: size.height * 0.02,
+          ),
+          Container(
+            height: size.height * 0.12,
+            width: size.width,
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Flexible(
+                  child: SizedBox(
+                    width: 10,
+                  ),
+                ),
+                Flexible(
+                  child: TextFormField(
+                    style: const TextStyle(
+                      fontFamily: "Avenir LT Std",
+                      color: Color(0xFF4682B4),
+                      fontSize: 20,
+                    ),
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.only(top: 10),
+                      labelText: "Search",
+                      labelStyle: TextStyle(
+                        fontFamily: "Avenir LT Std",
+                        color: Color(0xFF4682B4),
+                        fontSize: 16,
+                        height: 0.5,
+                      ),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    controller: searchController,
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please Enter a value.';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {},
+                  child: Image.asset(
+                    "assets/images/addec5a8-1f71-4772-96f0-843755aaaed1.png",
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                  child: Image.asset(
+                    "assets/images/53e933ab-b850-43e3-990f-61d635d4ac34.png",
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TimeAgo {
+  static String timeAgoSinceDate(String dateString,
+      {bool numericDates = true}) {
+    DateTime notificationDate =
+        DateFormat("yyyy-MM-dd hh:mm:ss").parse(dateString);
+    final date2 =
+        DateFormat("yyyy-MM-dd hh:mm:ss").parse(DateTime.now().toString());
+    final difference = date2.difference(notificationDate);
+
+    if (difference.inDays > 8) {
+      return DateFormat("yyyy-MM-dd")
+          .format(DateTime.parse(dateString.toString()))
+          .toString();
+    } else if ((difference.inDays / 7).floor() >= 1) {
+      return (numericDates) ? '1 week ago' : 'Last week';
+    } else if (difference.inDays >= 2) {
+      return '${difference.inDays} days ago';
+    } else if (difference.inDays >= 1) {
+      return (numericDates) ? '1 day ago' : 'Yesterday';
+    } else if (difference.inHours >= 2) {
+      return '${difference.inHours} hours ago';
+    } else if (difference.inHours >= 1) {
+      return (numericDates) ? '1 hour ago' : 'An hour ago';
+    } else if (difference.inMinutes >= 2) {
+      return '${difference.inMinutes} minutes ago';
+    } else if (difference.inMinutes >= 1) {
+      return (numericDates) ? '1 minute ago' : 'A minute ago';
+    } else if (difference.inSeconds >= 3) {
+      return '${difference.inSeconds} seconds ago';
+    } else {
+      return 'Just now';
+    }
+  }
+}

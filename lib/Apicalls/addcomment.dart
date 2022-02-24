@@ -1,0 +1,36 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+addcomment(
+  context,
+  String id,
+  String commenttext,
+) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String token = prefs.getString('token').toString();
+
+  var headers = {'Authorization': 'Bearer ' + token.toString()};
+  var request = http.MultipartRequest(
+      'POST', Uri.parse("https://apis.mysupnet.org/api/v1/comment"));
+  request.headers.addAll(headers);
+
+  request.fields.addAll({
+    'post_uuid': id,
+    'text': commenttext,
+  });
+
+  http.StreamedResponse response = await request.send();
+  var responsed = await http.Response.fromStream(response);
+  final responseData = json.decode(responsed.body);
+  if (response.statusCode == 200) {
+    // Navigator.of(context).push(MaterialPageRoute(
+    //   builder: (context) => const HomeFeedPage(),
+    // ));
+
+    return (responseData["data"]);
+  } else {
+    return (responseData["detail"]);
+  }
+}
