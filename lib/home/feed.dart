@@ -5,11 +5,16 @@ import 'dart:convert';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:mysupnet/Apicalls/deletepost.dart';
+import 'package:mysupnet/Apicalls/flag.dart';
 import 'package:mysupnet/Apicalls/likeapi.dart';
+import 'package:mysupnet/Apicalls/unlikeapi.dart';
 import 'package:mysupnet/drawer.dart';
 import 'package:mysupnet/home/comments.dart';
+import 'package:mysupnet/home/editpostpage.dart';
 import 'package:mysupnet/home/newpost.dart';
 import 'package:http/http.dart' as http;
+import 'package:mysupnet/home/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeFeedPage extends StatefulWidget {
@@ -48,9 +53,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
     String token = prefs.getString('token').toString();
     name = prefs.getString('name').toString();
     var headers = {
-      'Authorization':
-          // 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQyMzg0NjUwLCJpYXQiOjE2NDEwODg2NTAsImp0aSI6IjBhZjQxMjlkNjU0NjQ4YmFiMWE4ZTAxMmM3MGUzZWUxIiwidXNlcl9pZCI6NDcsIm5hbWUiOiJkZWVwaWthYSBzdWJyYW1hbmlhbSIsInN1cHBvcnRfZ3JvdXBfaWQiOjMsInN1cHBvcnRfZ3JvdXBfbmFtZSI6Imdyb3VwMTAiLCJpc19zdXBlcl9hZG1pbiI6ZmFsc2UsImlzX2FkbWluX3VzZXIiOnRydWV9.YZcUWPvRBBHMN75YPCN27oI5efWwIA0ysY73cZ_GS_A'
-          'Bearer ' + token.toString(),
+      'Authorization': 'Bearer ' + token.toString(),
     };
     var request = http.MultipartRequest(
         'GET', Uri.parse('https://apis.mysupnet.org/api/v1/post/all'));
@@ -68,8 +71,9 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
         int comments = postdata[i]["comments"].length;
 
         postdatamap[postdata[i]["uuid"].toString()] = {
+          "postvis": true,
           "isliked": postdata[i]["current_user_has_liked"],
-          "lclickcount": 0,
+          "lclickcount": postdata[i]["current_user_has_liked"] ? 1 : 0,
           "bclickcount": 0,
           "isbookmarked": false,
           "isvisible": false,
@@ -77,29 +81,15 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
           "commentscount": comments,
           "editvisible": false,
           "imgvisible": true,
+          "user_email": postdata[i]["user_email"].toString()
         };
+        postdatamap[[postdata[i]["uuid"].toString()].toString()] = {};
       }
     } else {
       return responseData["detail"];
     }
   }
 
-  // getConditionData() async {
-  //   var request = http.MultipartRequest(
-  //       'GET',
-  //       Uri.parse(
-  //           'https://apis.mysupnet.org/api/v1/supportgroup/disease/list'));
-  //   http.StreamedResponse response = await request.send();
-  //   var responsed = await http.Response.fromStream(response);
-  //   final item = json.decode(responsed.body);
-  //   setState(() {
-  //     isloading = true;
-
-  //     disList.remove("Condition");
-  //     item.forEach((key, value1) {
-  //       disList.add(key);
-  //     });
-  //   });
   @override
   void initState() {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -129,11 +119,19 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
     await likeapi(context, id, "post");
 
     setState(() {
+      postdatamap[id]["likecount"] = postdatamap[id]["likecount"] + 1;
+
       postdatamap[id]["isliked"] = true;
     });
-    if (postdatamap[id]["isliked"]) {
-      postdatamap[id]["likecount"] = postdatamap[id]["likecount"] + 1;
-    }
+  }
+
+  void unlike(String id) async {
+    await unlikeapi(context, id);
+
+    setState(() {
+      postdatamap[id]["isliked"] = false;
+      postdatamap[id]["likecount"] = postdatamap[id]["likecount"] - 1;
+    });
   }
 
   void bookmark(String id) {
@@ -212,11 +210,6 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                               const SizedBox(
                                 width: 20,
                               ),
-                              // Flexible(
-                              //   child: Image.asset(
-                              //     "assets/images/Camera.png",
-                              //   ),
-                              // ),
                             ],
                           ),
                         ),
@@ -235,18 +228,25 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                             return Card(
                                 child: Column(children: [
                               Stack(children: [
-                                post(
-                                  size,
-                                  psname,
-                                  postdata[index]["text"].toString(),
-                                  postdatamap[id]["commentscount"],
-                                  postdatamap[id]["likecount"],
-                                  index,
-                                  TimeAgo.timeAgoSinceDate(
-                                      DateTime.parse(postdata[index]["created"])
-                                          .toString()),
-                                  postdata[index]["user_condition"].toString(),
-                                  postdata[index]["uuid"].toString(),
+                                Visibility(
+                                  visible: postdatamap[id]["postvis"],
+                                  maintainSize: false,
+                                  child: post(
+                                    size,
+                                    psname,
+                                    postdata[index]["text"].toString(),
+                                    postdatamap[id]["commentscount"],
+                                    postdatamap[id]["likecount"],
+                                    index,
+                                    TimeAgo.timeAgoSinceDate(DateTime.parse(
+                                            postdata[index]["created"])
+                                        .toString()),
+                                    postdata[index]["user_condition"]
+                                        .toString(),
+                                    postdata[index]["uuid"].toString(),
+                                    postdata[index]["current_user_post"],
+                                    postdatamap[id]["user_email"],
+                                  ),
                                 ),
                               ])
                             ]));
@@ -302,18 +302,10 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
     );
   }
 
-  Center post(Size size, String name, String posttext, int commentscount,
-      int likecount, index, creattime, cond, id) {
+  Widget post(Size size, String name, String posttext, int commentscount,
+      int likecount, index, creattime, cond, id, bool current, String email) {
     commentdata.add(postdata[index]["comments"]);
-    // for (int i = 0; i < commentdata.length; i++) {
-    //   if (commentdata.isNotEmpty) {
-    //     commentdatamap[commentdata[0][i]["uuid"]] = {
-    //       "isliked": false,
-    //       "likecount": commentdata[0][i]["likes"],
-    //     };
-    //   }
-    // }
-    //print(commentdatamap);
+
     return Center(
       child: SizedBox(
         width: size.width * 0.95,
@@ -328,9 +320,17 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  child: Image.asset("assets/images/user.png"),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => UserProfileScreen(
+                              email: email,
+                            )));
+                  },
+                  child: CircleAvatar(
+                    radius: 20,
+                    child: Image.asset("assets/images/user.png"),
+                  ),
                 ),
                 const SizedBox(
                   width: 20,
@@ -379,31 +379,233 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                   ],
                 ),
                 const Spacer(),
-                // GestureDetector(
-                //   onTap: () async {
-                //     SharedPreferences prefs =
-                //         await SharedPreferences.getInstance();
-                //     String creatorid = prefs.getString('id').toString();
-                //   },
-                //   child: GestureDetector(
-                //     onTap: () {
-                //       setState(() {
-                //         postdatamap[id]["editvisible"] = true;
-                //         postdatamap[id]["imgvisible"] = false;
-                //       });
-                //     },
-                //     child: Visibility(
-                //       maintainSize: false,
-                //       maintainAnimation: true,
-                //       maintainState: true,
-                //       visible: postdatamap[id]["imgvisible"],
-                //       child: SizedBox(
-                //           height: size.height * 0.02,
-                //           child: Image.asset("assets/images/edit.png",
-                //               fit: BoxFit.contain)),
-                //     ),
-                //   ),
-                // ),
+                GestureDetector(
+                  onTap: () async {},
+                  child: postdatamap[id]["imgvisible"]
+                      ? GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              postdatamap[id]["editvisible"] = true;
+                              postdatamap[id]["imgvisible"] = false;
+                            });
+                          },
+                          child: Visibility(
+                            maintainSize: false,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            visible: postdatamap[id]["imgvisible"],
+                            child: SizedBox(
+                                height: size.height * 0.02,
+                                child: Image.asset("assets/images/edit.png",
+                                    fit: BoxFit.contain)),
+                          ),
+                        )
+                      : !current
+                          ? Visibility(
+                              maintainSize: false,
+                              maintainAnimation: true,
+                              maintainState: true,
+                              visible: postdatamap[id]["editvisible"],
+                              child: Container(
+                                transformAlignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    border: Border.all(width: 0.2),
+                                    borderRadius: BorderRadius.circular(5)),
+                                // height: size.height * 0.08,
+                                width: size.width * .15,
+                                child: Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await flag(context, id, "post");
+                                        setState(() {
+                                          postdatamap[id]["editvisible"] =
+                                              false;
+                                          postdatamap[id]["imgvisible"] = true;
+                                        });
+                                      },
+                                      child: SizedBox(
+                                          height: size.height * 0.02,
+                                          child: Row(
+                                            children: const [
+                                              Icon(
+                                                Icons.flag,
+                                                color: Colors.blue,
+                                                size: 15,
+                                              ),
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              Text(
+                                                "Flag",
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.blue),
+                                              ),
+                                            ],
+                                          )),
+                                    ),
+                                    const Divider(
+                                      thickness: 1,
+                                      height: 2,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          postdatamap[id]["editvisible"] =
+                                              false;
+                                          postdatamap[id]["imgvisible"] = true;
+                                        });
+                                      },
+                                      child: SizedBox(
+                                          height: size.height * 0.02,
+                                          child: Row(
+                                            children: const [
+                                              Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                                size: 15,
+                                              ),
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              Text(
+                                                "Close",
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.red),
+                                              ),
+                                            ],
+                                          )),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Visibility(
+                              maintainSize: false,
+                              maintainAnimation: true,
+                              maintainState: true,
+                              visible: postdatamap[id]["editvisible"],
+                              child: Container(
+                                transformAlignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    border: Border.all(width: 0.2),
+                                    borderRadius: BorderRadius.circular(5)),
+                                // height: size.height * 0.08,
+                                width: size.width * .15,
+                                child: Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EditPostPage(
+                                                      ptext:
+                                                          posttext.toString(),
+                                                      id: id,
+                                                    )));
+                                        setState(() {
+                                          postdatamap[id]["editvisible"] =
+                                              false;
+                                          postdatamap[id]["imgvisible"] = true;
+                                        });
+                                      },
+                                      child: SizedBox(
+                                          height: size.height * 0.02,
+                                          child: Row(
+                                            children: const [
+                                              Icon(
+                                                Icons.edit,
+                                                color: Colors.blue,
+                                                size: 15,
+                                              ),
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              Text(
+                                                "Edit",
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.blue),
+                                              ),
+                                            ],
+                                          )),
+                                    ),
+                                    const Divider(
+                                      thickness: 1,
+                                      height: 2,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await delpost(context, id);
+                                        setState(() {
+                                          postdatamap[id]["postvis"] = false;
+                                          postdatamap[id]["editvisible"] =
+                                              false;
+                                          postdatamap[id]["imgvisible"] = true;
+                                        });
+                                      },
+                                      child: SizedBox(
+                                          height: size.height * 0.02,
+                                          child: Row(
+                                            children: const [
+                                              Icon(
+                                                Icons.delete,
+                                                color: Colors.blue,
+                                                size: 15,
+                                              ),
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              Text(
+                                                "Delete",
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.blue),
+                                              ),
+                                            ],
+                                          )),
+                                    ),
+                                    const Divider(
+                                      thickness: 1,
+                                      height: 2,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          postdatamap[id]["editvisible"] =
+                                              false;
+                                          postdatamap[id]["imgvisible"] = true;
+                                        });
+                                      },
+                                      child: SizedBox(
+                                          height: size.height * 0.02,
+                                          child: Row(
+                                            children: const [
+                                              Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                                size: 15,
+                                              ),
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              Text(
+                                                "Close",
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.red),
+                                              ),
+                                            ],
+                                          )),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                ),
                 const SizedBox(
                   width: 20,
                 ),
@@ -442,11 +644,19 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          if (postdatamap[id]["lclickcount"] % 2 == 0) {
-                            like(id);
+                          if (!current) {
+                            if (!postdatamap[id]["isliked"]) {
+                              if (postdatamap[id]["lclickcount"] % 2 == 0) {
+                                like(id);
+                              }
+                            }
+
+                            if (postdatamap[id]["lclickcount"] % 2 == 1) {
+                              unlike(id);
+                            }
+                            postdatamap[id]["lclickcount"] =
+                                postdatamap[id]["lclickcount"] + 1;
                           }
-                          postdatamap[id]["lclickcount"] =
-                              postdatamap[id]["lclickcount"] + 1;
                         },
                         child: postdatamap[id]["isliked"]
                             ? const Icon(Icons.favorite, color: Colors.green)
@@ -594,33 +804,7 @@ class Topbar extends StatelessWidget {
                     width: 10,
                   ),
                 ),
-                Flexible(
-                  child: TextFormField(
-                    style: const TextStyle(
-                      fontFamily: "Avenir LT Std",
-                      color: Color(0xFF4682B4),
-                      fontSize: 20,
-                    ),
-                    decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.only(top: 10),
-                      labelText: "Search",
-                      labelStyle: TextStyle(
-                        fontFamily: "Avenir LT Std",
-                        color: Color(0xFF4682B4),
-                        fontSize: 16,
-                        height: 0.5,
-                      ),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    controller: searchController,
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please Enter a value.';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
+                const Spacer(),
                 GestureDetector(
                   onTap: () {},
                   child: Image.asset(
@@ -649,8 +833,8 @@ class TimeAgo {
       {bool numericDates = true}) {
     DateTime notificationDate =
         DateFormat("yyyy-MM-dd hh:mm:ss").parse(dateString);
-    final date2 =
-        DateFormat("yyyy-MM-dd hh:mm:ss").parse(DateTime.now().toString());
+    final date2 = DateFormat("yyyy-MM-dd hh:mm:ss")
+        .parse(DateTime.now().toUtc().toString());
     final difference = date2.difference(notificationDate);
 
     if (difference.inDays > 8) {

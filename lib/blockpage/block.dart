@@ -248,9 +248,10 @@ class Topbar extends StatelessWidget {
                     color: Color(0xFF4682B4),
                   ),
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const LoginPage(),
-                    ));
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
+                        (Route<dynamic> route) => false);
                   },
                 ),
               ),

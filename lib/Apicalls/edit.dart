@@ -41,17 +41,28 @@ edit(
   http.StreamedResponse response = await request.send();
   var responsed = await http.Response.fromStream(response);
   final responseData = json.decode(responsed.body);
-
   if (response.statusCode == 200) {
-    String name = responseData["data"]["name"].toString();
-    prefs.setString('name', name);
-    Navigator.of(context).pop();
+    String message = responseData["detail"];
+    // ignore: deprecated_member_use
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(
+          fontFamily: "Avenir LT Std",
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+    ));
+    if (message == "success") {
+      String name = responseData["data"]["name"].toString();
+      prefs.setString('name', name);
+      Navigator.of(context).pop();
 
-    Navigator.of(context).push(
-      CustomPageRoute(const ProfileScreen()),
-    );
-    return responseData["data"];
-  } else {
-    return responseData["detail"];
+      Navigator.of(context).push(
+        CustomPageRoute(const ProfileScreen()),
+      );
+      return responseData["data"];
+    }
   }
 }

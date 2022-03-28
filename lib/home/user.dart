@@ -5,20 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mysupnet/drawer.dart';
-import 'package:mysupnet/fadetransition.dart';
 import 'package:mysupnet/home/feed.dart';
-import 'package:mysupnet/profile/editprofile.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+class UserProfileScreen extends StatefulWidget {
+  final String email;
+  const UserProfileScreen({Key? key, required this.email}) : super(key: key);
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _UserProfileScreenState extends State<UserProfileScreen> {
   LinkedHashMap<String, dynamic> userdata = LinkedHashMap();
   var isLoading = true;
   String dob = "";
@@ -53,13 +52,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     var headers = {'Authorization': 'Bearer ' + token.toString()};
     var request = http.MultipartRequest(
         'GET', Uri.parse('https://apis.mysupnet.org/api/v1/user'));
-
     request.headers.addAll(headers);
-
+    request.fields.addAll({
+      "email": widget.email,
+    });
     http.StreamedResponse response = await request.send();
     var responsed = await http.Response.fromStream(response);
     final responseData = json.decode(responsed.body);
-
     if (response.statusCode == 200) {
       userdata = responseData["data"];
     } else {
@@ -145,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     ),
                                     Text(
-                                      "Born " + dob,
+                                      "Born " + userdata["phone"],
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         fontFamily: "Avenir LT Std",
@@ -361,46 +360,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: size.height * 0.05),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).pop();
-
-                          Navigator.of(context)
-                              .push(CustomPageRoute(const EditPage()));
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(4)),
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                    color:
-                                        const Color(0xffB8B8B8).withAlpha(100),
-                                    offset: const Offset(0, 4),
-                                    blurRadius: 8,
-                                    spreadRadius: 2)
-                              ],
-                              color: const Color(0xFF71B48D)),
-                          child: const Text(
-                            'EDIT',
-                            style: TextStyle(
-                              fontFamily: "Avenir LT Std",
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -458,53 +417,12 @@ class Topbar extends StatelessWidget {
                     width: size.width * 0.02,
                   ),
                 ),
-                const Text("PROFILE",
+                const Text("USER PROFILE",
                     style: TextStyle(
                       fontSize: 16,
                       color: Color(0xFF4682B4),
                       fontFamily: "Avenir LT Std",
                     )),
-                // Flexible(
-                //   child: TextFormField(
-                //     style: const TextStyle(
-                //       fontFamily: "Avenir LT Std",
-                //       color: Color(0xFF4682B4),
-                //       fontSize: 20,
-                //     ),
-                //     decoration: const InputDecoration(
-                //       contentPadding: EdgeInsets.only(top: 10),
-                //       labelText: "Search",
-                //       labelStyle: TextStyle(
-                //         fontFamily: "Avenir LT Std",
-                //         color: Color(0xFF4682B4),
-                //         fontSize: 16,
-                //         height: 0.5,
-                //       ),
-                //     ),
-                //     keyboardType: TextInputType.emailAddress,
-                //     controller: searchController,
-                //     validator: (value) {
-                //       if (value == null) {
-                //         return 'Please Enter a value.';
-                //       }
-                //       return null;
-                //     },
-                //   ),
-                // ),
-                // GestureDetector(
-                //   onTap: () {},
-                //   child: Image.asset(
-                //     "assets/images/addec5a8-1f71-4772-96f0-843755aaaed1.png",
-                //   ),
-                // ),
-                // GestureDetector(
-                //   onTap: () {
-                //     Scaffold.of(context).openEndDrawer();
-                //   },
-                //   child: Image.asset(
-                //     "assets/images/53e933ab-b850-43e3-990f-61d635d4ac34.png",
-                //   ),
-                // ),
               ],
             ),
           ),

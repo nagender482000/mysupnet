@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 log(String email, String password, BuildContext context) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  print("share");
 
   // var headers = {'Authorization': 'Bearer ' + token.toString()};
   var request = http.MultipartRequest(
@@ -18,22 +17,56 @@ log(String email, String password, BuildContext context) async {
 
   http.StreamedResponse response = await request.send();
   var responsed = await http.Response.fromStream(response);
-  print("response");
 
   final responseData = json.decode(responsed.body);
-  print(responseData);
   if (responseData["status"] >= 200 && responseData["status"] <= 400) {
-    String token = responseData["data"]["access_token"].toString();
-    String id = responseData["data"]["user"]["id"].toString();
-    prefs.setString('islogged', "true");
-    prefs.setString('token', token);
-    prefs.setString('id', id);
-    String name = responseData["data"]["user"]["name"].toString();
-    prefs.setString('name', name);
-    splash(token, context);
+    String message = responseData["detail"];
+    // ignore: deprecated_member_use
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(
+          fontFamily: "Avenir LT Std",
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+    ));
+    if (message == "success") {
+      String token = responseData["data"]["access_token"].toString();
+      String id = responseData["data"]["user"]["id"].toString();
+      prefs.setString('islogged', "true");
+      prefs.setString('token', token);
+      prefs.setString('id', id);
+      String name = responseData["data"]["user"]["name"].toString();
+      prefs.setString('name', name);
+      splash(token, context);
+    }
   } else if (responseData["status"] >= 400 && responseData["status"] <= 500) {
-    //String message = responseData["detail"];
+    String message = responseData["detail"];
+    // ignore: deprecated_member_use
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(
+          fontFamily: "Avenir LT Std",
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+    ));
   } else {
-    //String message = "Error not Defined.";
+    String message = responseData["detail"];
+    // ignore: deprecated_member_use
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(
+          fontFamily: "Avenir LT Std",
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+    ));
   }
 }

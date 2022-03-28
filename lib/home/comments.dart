@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mysupnet/Apicalls/addcomment.dart';
 import 'package:http/http.dart' as http;
 import 'package:mysupnet/Apicalls/likeapi.dart';
+import 'package:mysupnet/Apicalls/unlikeapi.dart';
 import 'package:mysupnet/home/feed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,6 +38,16 @@ class _CommentsSecState extends State<CommentsSec> {
       commentdatamap[id]["isliked"] = true;
 
       widget.commentdata[0][i]["likes"] = widget.commentdata[0][i]["likes"] + 1;
+    });
+  }
+
+  void cunlike(String id, i) {
+    unlikeapi(context, id);
+
+    setState(() {
+      commentdatamap[id]["isliked"] = false;
+
+      widget.commentdata[0][i]["likes"] = widget.commentdata[0][i]["likes"] - 1;
     });
   }
 
@@ -90,11 +101,16 @@ class _CommentsSecState extends State<CommentsSec> {
           int comments = widget.postdata[i]["comments"].length;
 
           widget.postdatamap[widget.postdata[i]["uuid"].toString()] = {
+            "postvis": true,
             "isliked": false,
+            "lclickcount": 0,
+            "bclickcount": 0,
             "isbookmarked": false,
             "isvisible": false,
             "likecount": likes,
             "commentscount": comments,
+            "editvisible": false,
+            "imgvisible": true,
           };
         }
       });

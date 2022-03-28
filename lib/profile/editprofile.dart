@@ -255,869 +255,879 @@ class _EditPageState extends State<EditPage> {
       backgroundColor: Colors.white,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SizedBox(
-              height: size.height * 2,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Topbar(size: size),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      width: size.width * 0.9,
-                      child: Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 50,
-                                  child: Image.asset(
-                                    "assets/images/user.png",
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 50,
-                                ),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Container(
-                                    width: size.width * 0.4,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 13),
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(4)),
-                                        border: Border.all(color: Colors.green),
-                                        color: Colors.white),
-                                    child: const Text(
-                                      'UPLOAD IMAGE',
-                                      style: TextStyle(
-                                        fontFamily: "Avenir LT Std",
-                                        color: Color(0xFF4078A6),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: size.height * 0.03),
-                            const Text(
-                              "Personal Information",
-                              style: TextStyle(
-                                fontFamily: "Avenir LT Std",
-                                color: Color(0xFF4682B4),
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              child: TextFormField(
-                                style: const TextStyle(
-                                  fontFamily: "Avenir LT Std",
-                                  color: Color(0xFF000000),
-                                  fontSize: 20,
-                                ),
-                                decoration: const InputDecoration(
-                                  labelText: "Full Name",
-                                  labelStyle: TextStyle(
-                                    fontFamily: "Avenir LT Std",
-                                    color: Color(0xFFB8B8B8),
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                keyboardType: TextInputType.name,
-                                controller: nameController,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please Enter Name';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            // Container(
-                            //   alignment: Alignment.center,
-                            //   child: TextFormField(
-                            //     style: const TextStyle(
-                            //       fontFamily: "Avenir LT Std",
-                            //       color: Color(0xFF000000),
-                            //       fontSize: 20,
-                            //     ),
-                            //     decoration: const InputDecoration(
-                            //       labelText: "Email",
-                            //       labelStyle: TextStyle(
-                            //         fontFamily: "Avenir LT Std",
-                            //         color: Color(0xFFB8B8B8),
-                            //         fontSize: 16,
-                            //       ),
-                            //     ),
-                            //     keyboardType: TextInputType.emailAddress,
-                            //     controller: emailController,
-                            //     validator: (value) {
-                            //       if (value == null || value.isEmpty) {
-                            //         return 'Please Enter Email';
-                            //       } else if (!value.contains('@')) {
-                            //         return 'Please Enter Valid Email';
-                            //       }
-                            //       return null;
-                            //     },
-                            //   ),
-                            // ),
-                            // const SizedBox(
-                            //   height: 10,
-                            // ),
-                            const Text(
-                              "Gender",
-                              style: TextStyle(
-                                fontFamily: "Avenir LT Std",
-                                color: Color(0xFFB8B8B8),
-                                fontSize: 14,
-                              ),
-                            ),
-                            SizedBox(
-                              width: size.width,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+          : Builder(builder: (context) {
+              return SizedBox(
+                height: size.height * 2,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Topbar(size: size),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        width: size.width * 0.9,
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
                                 children: [
-                                  SizedBox(
-                                    width: size.width * 0.06,
-                                  ),
-                                  Radio(
-                                    value: 1,
-                                    groupValue: _gradioSelected,
-                                    activeColor: Colors.blue,
-                                    onChanged: (int? value) {
-                                      setState(() {
-                                        _gradioSelected = value!;
-                                        gender = 'Male';
-                                      });
-                                    },
-                                  ),
-                                  const Text(
-                                    "Male",
-                                    style: TextStyle(
-                                      fontFamily: "Avenir LT Std",
-                                      color: Color(0xFF000000),
-                                      fontSize: 20,
+                                  CircleAvatar(
+                                    radius: 50,
+                                    child: Image.asset(
+                                      "assets/images/user.png",
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: size.width * 0.2,
+                                  const SizedBox(
+                                    width: 50,
                                   ),
-                                  Radio(
-                                    value: 2,
-                                    groupValue: _gradioSelected,
-                                    activeColor: Colors.blue,
-                                    onChanged: (int? value) {
-                                      setState(() {
-                                        _gradioSelected = value!;
-                                        gender = 'Female';
-                                      });
-                                    },
-                                  ),
-                                  const Text(
-                                    "Female",
-                                    style: TextStyle(
-                                      fontFamily: "Avenir LT Std",
-                                      color: Color(0xFF000000),
-                                      fontSize: 20,
+                                  InkWell(
+                                    onTap: () {},
+                                    child: Container(
+                                      width: size.width * 0.4,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 13),
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(4)),
+                                          border:
+                                              Border.all(color: Colors.green),
+                                          color: Colors.white),
+                                      child: const Text(
+                                        'UPLOAD IMAGE',
+                                        style: TextStyle(
+                                          fontFamily: "Avenir LT Std",
+                                          color: Color(0xFF4078A6),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              child: GestureDetector(
-                                onTap: () async {
-                                  await showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime(1900),
-                                    lastDate: DateTime(2025),
-                                  ).then((selectedDate) {
-                                    if (selectedDate != null) {
-                                      dateController.text =
-                                          DateFormat("yyyy-MM-dd")
-                                              .format(selectedDate);
-                                    }
-                                  });
-                                },
-                                child: Row(
-                                  children: [
-                                    Flexible(
-                                      child: TextFormField(
-                                        enabled: false,
-                                        style: const TextStyle(
-                                          fontFamily: "Avenir LT Std",
-                                          color: Color(0xFF000000),
-                                          fontSize: 20,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          labelText: "DOB (Date of Birth)",
-                                          labelStyle: TextStyle(
-                                            fontFamily: "Avenir LT Std",
-                                            color: Color(0xFFB8B8B8),
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.name,
-                                        controller: dateController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please Enter Date';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 50,
-                                    ),
-                                    Flexible(
-                                      child: InkWell(
-                                        onTap: () async {
-                                          await showDatePicker(
-                                            context: context,
-                                            initialDate: DateTime.now(),
-                                            firstDate: DateTime(1900),
-                                            lastDate: DateTime(2025),
-                                          ).then((selectedDate) {
-                                            if (selectedDate != null) {
-                                              dateController.text =
-                                                  DateFormat("yyyy-MM-dd")
-                                                      .format(selectedDate);
-                                            }
-                                          });
-                                        },
-                                        child: Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 13),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(4)),
-                                              boxShadow: <BoxShadow>[
-                                                BoxShadow(
-                                                    color:
-                                                        const Color(0xffB8B8B8)
-                                                            .withAlpha(100),
-                                                    offset: const Offset(0, 4),
-                                                    blurRadius: 8,
-                                                    spreadRadius: 2)
-                                              ],
-                                              color: Colors.white),
-                                          child: const Text(
-                                            'Select',
-                                            style: TextStyle(
-                                              fontFamily: "Avenir LT Std",
-                                              color: Color(0xFF4682B4),
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                              SizedBox(height: size.height * 0.03),
+                              const Text(
+                                "Personal Information",
+                                style: TextStyle(
+                                  fontFamily: "Avenir LT Std",
+                                  color: Color(0xFF4682B4),
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                            // const SizedBox(
-                            //   height: 16,
-                            // ),
-                            // Container(
-                            //   alignment: Alignment.center,
-                            //   child: Row(
-                            //     children: [
-                            //       Flexible(
-                            //         child: TextFormField(
-                            //           style: const TextStyle(
-                            //             fontFamily: "Avenir LT Std",
-                            //             color: Color(0xFF000000),
-                            //             fontSize: 20,
-                            //           ),
-                            //           decoration: const InputDecoration(
-                            //             labelText: "Country of Residence",
-                            //             labelStyle: TextStyle(
-                            //               fontFamily: "Avenir LT Std",
-                            //               color: Color(0xFFB8B8B8),
-                            //               fontSize: 16,
-                            //             ),
-                            //           ),
-                            //           keyboardType: TextInputType.name,
-                            //           controller: countryController,
-                            //           validator: (value) {
-                            //             if (value == null || value.isEmpty) {
-                            //               return 'Please Enter Country';
-                            //             }
-                            //             return null;
-                            //           },
-                            //         ),
-                            //       ),
-                            //       const SizedBox(
-                            //         width: 50,
-                            //       ),
-                            //       Flexible(
-                            //         child: InkWell(
-                            //           onTap: () async {
-                            //             showCountryPicker(
-                            //               context: context,
-                            //               //Optional.  Can be used to exclude(remove) one ore more country from the countries list (optional).
-                            //               exclude: <String>['KN', 'MF'],
-                            //               //Optional. Shows phone code before the country name.
-                            //               showPhoneCode: true,
-                            //               onSelect: (Country country) {
-                            //                 countryController.text = country
-                            //                     .displayNameNoCountryCode
-                            //                     .toString();
-                            //               },
-                            //               // Optional. Sets the theme for the country list picker.
-                            //               countryListTheme:
-                            //                   CountryListThemeData(
-                            //                 // Optional. Sets the border radius for the bottomsheet.
-                            //                 borderRadius:
-                            //                     const BorderRadius.only(
-                            //                   topLeft: Radius.circular(40.0),
-                            //                   topRight: Radius.circular(40.0),
-                            //                 ),
-                            //                 // Optional. Styles the search field.
-                            //                 inputDecoration: InputDecoration(
-                            //                   labelText: 'Search',
-                            //                   hintText:
-                            //                       'Start typing to search',
-                            //                   prefixIcon:
-                            //                       const Icon(Icons.search),
-                            //                   border: OutlineInputBorder(
-                            //                     borderSide: BorderSide(
-                            //                       color: const Color(0xFF8C98A8)
-                            //                           .withOpacity(0.2),
-                            //                     ),
-                            //                   ),
-                            //                 ),
-                            //               ),
-                            //             );
-                            //           },
-                            //           child: Container(
-                            //             width:
-                            //                 MediaQuery.of(context).size.width,
-                            //             padding: const EdgeInsets.symmetric(
-                            //                 vertical: 13),
-                            //             alignment: Alignment.center,
-                            //             decoration: BoxDecoration(
-                            //                 borderRadius:
-                            //                     const BorderRadius.all(
-                            //                         Radius.circular(4)),
-                            //                 boxShadow: <BoxShadow>[
-                            //                   BoxShadow(
-                            //                       color: const Color(0xffB8B8B8)
-                            //                           .withAlpha(100),
-                            //                       offset: const Offset(0, 4),
-                            //                       blurRadius: 8,
-                            //                       spreadRadius: 2)
-                            //                 ],
-                            //                 color: Colors.white),
-                            //             child: const Text(
-                            //               'Select',
-                            //               style: TextStyle(
-                            //                 fontFamily: "Avenir LT Std",
-                            //                 color: Color(0xFF4682B4),
-                            //                 fontSize: 20,
-                            //                 fontWeight: FontWeight.bold,
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ),
-                            //       )
-                            //     ],
-                            //   ),
-                            // ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Container(
-                                height: 100,
-                                width: size.width,
-                                alignment: Alignment.topLeft,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      "Phone",
-                                      style: TextStyle(
-                                        fontFamily: "Avenir LT Std",
-                                        color: Color(0xFFB8B8B8),
-                                        fontSize: 14,
-                                      ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                child: TextFormField(
+                                  style: const TextStyle(
+                                    fontFamily: "Avenir LT Std",
+                                    color: Color(0xFF000000),
+                                    fontSize: 20,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    labelText: "Full Name",
+                                    labelStyle: TextStyle(
+                                      fontFamily: "Avenir LT Std",
+                                      color: Color(0xFFB8B8B8),
+                                      fontSize: 16,
                                     ),
-                                    IntlPhoneField(
-                                      decoration: const InputDecoration(
-                                        counterStyle: TextStyle(fontSize: 0),
-                                        // labelText: 'Phone',
-                                        // labelStyle: TextStyle(
-                                        //   fontFamily: "Avenir LT Std",
-                                        //   color: Color(0xFFB8B8B8),
-                                        //   fontSize: 16,
-                                        // ),
-                                        border: OutlineInputBorder(
-                                          borderSide: BorderSide(width: 20),
-                                        ),
-                                      ),
-                                      initialCountryCode: countrycode,
-                                      initialValue: numb,
-                                      onChanged: (phone) {
-                                        countrycode =
-                                            phone.countryISOCode.toString();
-                                        numb = phone.number.toString();
+                                  ),
+                                  keyboardType: TextInputType.name,
+                                  controller: nameController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please Enter Name';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              // Container(
+                              //   alignment: Alignment.center,
+                              //   child: TextFormField(
+                              //     style: const TextStyle(
+                              //       fontFamily: "Avenir LT Std",
+                              //       color: Color(0xFF000000),
+                              //       fontSize: 20,
+                              //     ),
+                              //     decoration: const InputDecoration(
+                              //       labelText: "Email",
+                              //       labelStyle: TextStyle(
+                              //         fontFamily: "Avenir LT Std",
+                              //         color: Color(0xFFB8B8B8),
+                              //         fontSize: 16,
+                              //       ),
+                              //     ),
+                              //     keyboardType: TextInputType.emailAddress,
+                              //     controller: emailController,
+                              //     validator: (value) {
+                              //       if (value == null || value.isEmpty) {
+                              //         return 'Please Enter Email';
+                              //       } else if (!value.contains('@')) {
+                              //         return 'Please Enter Valid Email';
+                              //       }
+                              //       return null;
+                              //     },
+                              //   ),
+                              // ),
+                              // const SizedBox(
+                              //   height: 10,
+                              // ),
+                              const Text(
+                                "Gender",
+                                style: TextStyle(
+                                  fontFamily: "Avenir LT Std",
+                                  color: Color(0xFFB8B8B8),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              SizedBox(
+                                width: size.width,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: size.width * 0.06,
+                                    ),
+                                    Radio(
+                                      value: 1,
+                                      groupValue: _gradioSelected,
+                                      activeColor: Colors.blue,
+                                      onChanged: (int? value) {
+                                        setState(() {
+                                          _gradioSelected = value!;
+                                          gender = 'Male';
+                                        });
                                       },
                                     ),
-                                  ],
-                                )),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            const Text(
-                              "Disease Information",
-                              style: TextStyle(
-                                fontFamily: "Avenir LT Std",
-                                color: Color(0xFF4682B4),
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            // const SizedBox(
-                            //   height: 16,
-                            // ),
-                            // const Text(
-                            //   "Select condition.",
-                            //   style: TextStyle(
-                            //     fontFamily: "Avenir LT Std",
-                            //     color: Color(0xFFB8B8B8),
-                            //     fontSize: 14,
-                            //   ),
-                            // ),
-                            // Container(
-                            //   padding: const EdgeInsets.only(
-                            //       left: 16.0, right: 16.0),
-                            //   decoration: const BoxDecoration(
-                            //     border: Border(
-                            //       bottom:
-                            //           BorderSide(color: Colors.grey, width: 1),
-                            //     ),
-                            //   ),
-                            //   child: DropdownButtonHideUnderline(
-                            //     child: DropdownButton(
-                            //       hint: const Text('Condition'),
-                            //       dropdownColor: Colors.white,
-                            //       elevation: 5,
-                            //       icon: const Icon(
-                            //         Icons.arrow_drop_down,
-                            //         color: Colors.blue,
-                            //       ),
-                            //       iconSize: 36.0,
-                            //       isExpanded: true,
-                            //       value: _disval,
-                            //       style: const TextStyle(
-                            //           color: Color(0xff2F3037), fontSize: 22.0),
-                            //       onChanged: (value) {
-                            //         setState(() {
-                            //           _disval = value.toString();
-                            //           grpnameset(_disval);
-                            //         });
-                            //       },
-                            //       items: disList.map((value) {
-                            //         return DropdownMenuItem(
-                            //           value: value,
-                            //           child: Text(
-                            //             value,
-                            //             style: const TextStyle(
-                            //               fontFamily: "Avenir LT Std",
-                            //               color: Color(0xFF000000),
-                            //               fontSize: 20,
-                            //             ),
-                            //           ),
-                            //         );
-                            //       }).toList(),
-                            //     ),
-                            //   ),
-                            // ),
-                            // const SizedBox(
-                            //   height: 16,
-                            // ),
-                            // const Text(
-                            //   "Select support group.",
-                            //   style: TextStyle(
-                            //     fontFamily: "Avenir LT Std",
-                            //     color: Color(0xFFB8B8B8),
-                            //     fontSize: 14,
-                            //   ),
-                            // ),
-                            // Container(
-                            //   padding: const EdgeInsets.only(
-                            //       left: 16.0, right: 16.0),
-                            //   decoration: const BoxDecoration(
-                            //     border: Border(
-                            //       bottom:
-                            //           BorderSide(color: Colors.grey, width: 1),
-                            //     ),
-                            //   ),
-                            //   child: DropdownButtonHideUnderline(
-                            //     child: DropdownButton(
-                            //       hint: const Text('Group'),
-                            //       dropdownColor: Colors.white,
-                            //       elevation: 5,
-                            //       icon: const Icon(
-                            //         Icons.arrow_drop_down,
-                            //         color: Colors.blue,
-                            //       ),
-                            //       iconSize: 36.0,
-                            //       isExpanded: true,
-                            //       value: grpval,
-                            //       style: const TextStyle(
-                            //           color: Color(0xff2F3037), fontSize: 22.0),
-                            //       onChanged: (value) {
-                            //         setState(() {
-                            //           grpidsearch(value.toString(), grpList);
-                            //           grpval = value.toString();
-                            //         });
-                            //       },
-                            //       items: grpname.map((value) {
-                            //         return DropdownMenuItem(
-                            //           value: value,
-                            //           child: Text(
-                            //             value,
-                            //             style: const TextStyle(
-                            //               fontFamily: "Avenir LT Std",
-                            //               color: Color(0xFF000000),
-                            //               fontSize: 20,
-                            //             ),
-                            //           ),
-                            //         );
-                            //       }).toList(),
-                            //     ),
-                            //   ),
-                            // ),
-                            Container(
-                              alignment: Alignment.center,
-                              child: GestureDetector(
-                                onTap: () async {
-                                  await showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime(1900),
-                                    lastDate: DateTime(2025),
-                                  ).then((selectedDate) {
-                                    if (selectedDate != null) {
-                                      yearController.text =
-                                          DateFormat("yyyy-MM-dd")
-                                              .format(selectedDate);
-                                    }
-                                  });
-                                },
-                                child: Row(
-                                  children: [
-                                    Flexible(
-                                      child: TextFormField(
-                                        enabled: false,
-                                        style: const TextStyle(
-                                          fontFamily: "Avenir LT Std",
-                                          color: Color(0xFF000000),
-                                          fontSize: 20,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          labelText: "Year of Diagnosis",
-                                          labelStyle: TextStyle(
-                                            fontFamily: "Avenir LT Std",
-                                            color: Color(0xFFB8B8B8),
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.name,
-                                        controller: yearController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please Enter Year';
-                                          }
-                                          return null;
-                                        },
+                                    const Text(
+                                      "Male",
+                                      style: TextStyle(
+                                        fontFamily: "Avenir LT Std",
+                                        color: Color(0xFF000000),
+                                        fontSize: 20,
                                       ),
                                     ),
-                                    const SizedBox(
-                                      width: 50,
+                                    SizedBox(
+                                      width: size.width * 0.2,
                                     ),
-                                    Flexible(
-                                      child: InkWell(
-                                        onTap: () async {
-                                          await showDatePicker(
-                                            context: context,
-                                            initialDate: DateTime.now(),
-                                            firstDate: DateTime(1900),
-                                            lastDate: DateTime(2025),
-                                          ).then((selectedDate) {
-                                            if (selectedDate != null) {
-                                              yearController.text =
-                                                  DateFormat("yyyy-MM-dd")
-                                                      .format(selectedDate);
-                                            }
-                                          });
-                                        },
-                                        child: Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 13),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(4)),
-                                              boxShadow: <BoxShadow>[
-                                                BoxShadow(
-                                                    color:
-                                                        const Color(0xffB8B8B8)
-                                                            .withAlpha(100),
-                                                    offset: const Offset(0, 4),
-                                                    blurRadius: 8,
-                                                    spreadRadius: 2)
-                                              ],
-                                              color: Colors.white),
-                                          child: const Text(
-                                            'Select',
-                                            style: TextStyle(
+                                    Radio(
+                                      value: 2,
+                                      groupValue: _gradioSelected,
+                                      activeColor: Colors.blue,
+                                      onChanged: (int? value) {
+                                        setState(() {
+                                          _gradioSelected = value!;
+                                          gender = 'Female';
+                                        });
+                                      },
+                                    ),
+                                    const Text(
+                                      "Female",
+                                      style: TextStyle(
+                                        fontFamily: "Avenir LT Std",
+                                        color: Color(0xFF000000),
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(1900),
+                                      lastDate: DateTime(2025),
+                                    ).then((selectedDate) {
+                                      if (selectedDate != null) {
+                                        dateController.text =
+                                            DateFormat("yyyy-MM-dd")
+                                                .format(selectedDate);
+                                      }
+                                    });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Flexible(
+                                        child: TextFormField(
+                                          enabled: false,
+                                          style: const TextStyle(
+                                            fontFamily: "Avenir LT Std",
+                                            color: Color(0xFF000000),
+                                            fontSize: 20,
+                                          ),
+                                          decoration: const InputDecoration(
+                                            labelText: "DOB (Date of Birth)",
+                                            labelStyle: TextStyle(
                                               fontFamily: "Avenir LT Std",
-                                              color: Color(0xFF4682B4),
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFFB8B8B8),
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          keyboardType: TextInputType.name,
+                                          controller: dateController,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please Enter Date';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 50,
+                                      ),
+                                      Flexible(
+                                        child: InkWell(
+                                          onTap: () async {
+                                            await showDatePicker(
+                                              context: context,
+                                              initialDate: DateTime.now(),
+                                              firstDate: DateTime(1900),
+                                              lastDate: DateTime(2025),
+                                            ).then((selectedDate) {
+                                              if (selectedDate != null) {
+                                                dateController.text =
+                                                    DateFormat("yyyy-MM-dd")
+                                                        .format(selectedDate);
+                                              }
+                                            });
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 13),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(4)),
+                                                boxShadow: <BoxShadow>[
+                                                  BoxShadow(
+                                                      color: const Color(
+                                                              0xffB8B8B8)
+                                                          .withAlpha(100),
+                                                      offset:
+                                                          const Offset(0, 4),
+                                                      blurRadius: 8,
+                                                      spreadRadius: 2)
+                                                ],
+                                                color: Colors.white),
+                                            child: const Text(
+                                              'Select',
+                                              style: TextStyle(
+                                                fontFamily: "Avenir LT Std",
+                                                color: Color(0xFF4682B4),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            // const SizedBox(
-                            //   height: 16,
-                            // ),
-                            // const Text(
-                            //   "Hospital",
-                            //   style: TextStyle(
-                            //     fontFamily: "Avenir LT Std",
-                            //     color: Color(0xFFB8B8B8),
-                            //     fontSize: 14,
-                            //   ),
-                            // ),
-                            // Container(
-                            //   padding: const EdgeInsets.only(
-                            //       left: 16.0, right: 16.0),
-                            //   decoration: const BoxDecoration(
-                            //     border: Border(
-                            //       bottom:
-                            //           BorderSide(color: Colors.grey, width: 1),
-                            //     ),
-                            //   ),
-                            //   child: DropdownButtonHideUnderline(
-                            //     child: DropdownButton(
-                            //       hint: const Text('Condition'),
-                            //       dropdownColor: Colors.white,
-                            //       elevation: 5,
-                            //       icon: const Icon(
-                            //         Icons.arrow_drop_down,
-                            //         color: Colors.blue,
-                            //       ),
-                            //       iconSize: 36.0,
-                            //       isExpanded: true,
-                            //       value: hospitalVal,
-                            //       style: const TextStyle(
-                            //           color: Color(0xff2F3037), fontSize: 22.0),
-                            //       onChanged: (value) {
-                            //         setState(() {
-                            //           hospitalVal = value.toString();
-                            //         });
-                            //       },
-                            //       items: hospitalList.map((value) {
-                            //         return DropdownMenuItem(
-                            //           value: value,
-                            //           child: Text(
-                            //             value,
-                            //             style: const TextStyle(
-                            //               fontFamily: "Avenir LT Std",
-                            //               color: Color(0xFF000000),
-                            //               fontSize: 20,
-                            //             ),
-                            //           ),
-                            //         );
-                            //       }).toList(),
-                            //     ),
-                            //   ),
-                            // ),
-                            // const SizedBox(
-                            //   height: 10,
-                            // ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              child: TextFormField(
-                                style: const TextStyle(
-                                  fontFamily: "Avenir LT Std",
-                                  color: Color(0xFF000000),
-                                  fontSize: 20,
-                                ),
-                                decoration: const InputDecoration(
-                                  labelText: "Hospital",
-                                  labelStyle: TextStyle(
-                                    fontFamily: "Avenir LT Std",
-                                    color: Color(0xFFB8B8B8),
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                keyboardType: TextInputType.name,
-                                controller: hospitalController,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please Enter Hospital';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              child: TextFormField(
-                                style: const TextStyle(
-                                  fontFamily: "Avenir LT Std",
-                                  color: Color(0xFF000000),
-                                  fontSize: 20,
-                                ),
-                                decoration: const InputDecoration(
-                                  labelText: "Medications",
-                                  labelStyle: TextStyle(
-                                    fontFamily: "Avenir LT Std",
-                                    color: Color(0xFFB8B8B8),
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                keyboardType: TextInputType.emailAddress,
-                                controller: medicationController,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please Enter Medications';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              child: TextFormField(
-                                style: const TextStyle(
-                                  fontFamily: "Avenir LT Std",
-                                  color: Color(0xFF000000),
-                                  fontSize: 20,
-                                ),
-                                decoration: const InputDecoration(
-                                  labelText: "Doctor",
-                                  labelStyle: TextStyle(
-                                    fontFamily: "Avenir LT Std",
-                                    color: Color(0xFFB8B8B8),
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                keyboardType: TextInputType.emailAddress,
-                                controller: doctorController,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please Enter Doctor';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 30,
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                await edit(
-                                  context,
-                                  nameController.text,
-                                  gender,
-                                  dateController.text,
-                                  countrycode,
-                                  numb,
-                                  yearController.text,
-                                  hospitalController.text,
-                                  medicationController.text,
-                                  doctorController.text,
-                                );
-                              },
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 13),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(4)),
-                                    boxShadow: <BoxShadow>[
-                                      BoxShadow(
-                                          color: const Color(0xffB8B8B8)
-                                              .withAlpha(100),
-                                          offset: const Offset(0, 4),
-                                          blurRadius: 8,
-                                          spreadRadius: 2)
+                                      )
                                     ],
-                                    color: const Color(0xFF71B48D)),
-                                child: const Text(
-                                  'SAVE',
-                                  style: TextStyle(
-                                    fontFamily: "Avenir LT Std",
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                          ],
+                              // const SizedBox(
+                              //   height: 16,
+                              // ),
+                              // Container(
+                              //   alignment: Alignment.center,
+                              //   child: Row(
+                              //     children: [
+                              //       Flexible(
+                              //         child: TextFormField(
+                              //           style: const TextStyle(
+                              //             fontFamily: "Avenir LT Std",
+                              //             color: Color(0xFF000000),
+                              //             fontSize: 20,
+                              //           ),
+                              //           decoration: const InputDecoration(
+                              //             labelText: "Country of Residence",
+                              //             labelStyle: TextStyle(
+                              //               fontFamily: "Avenir LT Std",
+                              //               color: Color(0xFFB8B8B8),
+                              //               fontSize: 16,
+                              //             ),
+                              //           ),
+                              //           keyboardType: TextInputType.name,
+                              //           controller: countryController,
+                              //           validator: (value) {
+                              //             if (value == null || value.isEmpty) {
+                              //               return 'Please Enter Country';
+                              //             }
+                              //             return null;
+                              //           },
+                              //         ),
+                              //       ),
+                              //       const SizedBox(
+                              //         width: 50,
+                              //       ),
+                              //       Flexible(
+                              //         child: InkWell(
+                              //           onTap: () async {
+                              //             showCountryPicker(
+                              //               context: context,
+                              //               //Optional.  Can be used to exclude(remove) one ore more country from the countries list (optional).
+                              //               exclude: <String>['KN', 'MF'],
+                              //               //Optional. Shows phone code before the country name.
+                              //               showPhoneCode: true,
+                              //               onSelect: (Country country) {
+                              //                 countryController.text = country
+                              //                     .displayNameNoCountryCode
+                              //                     .toString();
+                              //               },
+                              //               // Optional. Sets the theme for the country list picker.
+                              //               countryListTheme:
+                              //                   CountryListThemeData(
+                              //                 // Optional. Sets the border radius for the bottomsheet.
+                              //                 borderRadius:
+                              //                     const BorderRadius.only(
+                              //                   topLeft: Radius.circular(40.0),
+                              //                   topRight: Radius.circular(40.0),
+                              //                 ),
+                              //                 // Optional. Styles the search field.
+                              //                 inputDecoration: InputDecoration(
+                              //                   labelText: 'Search',
+                              //                   hintText:
+                              //                       'Start typing to search',
+                              //                   prefixIcon:
+                              //                       const Icon(Icons.search),
+                              //                   border: OutlineInputBorder(
+                              //                     borderSide: BorderSide(
+                              //                       color: const Color(0xFF8C98A8)
+                              //                           .withOpacity(0.2),
+                              //                     ),
+                              //                   ),
+                              //                 ),
+                              //               ),
+                              //             );
+                              //           },
+                              //           child: Container(
+                              //             width:
+                              //                 MediaQuery.of(context).size.width,
+                              //             padding: const EdgeInsets.symmetric(
+                              //                 vertical: 13),
+                              //             alignment: Alignment.center,
+                              //             decoration: BoxDecoration(
+                              //                 borderRadius:
+                              //                     const BorderRadius.all(
+                              //                         Radius.circular(4)),
+                              //                 boxShadow: <BoxShadow>[
+                              //                   BoxShadow(
+                              //                       color: const Color(0xffB8B8B8)
+                              //                           .withAlpha(100),
+                              //                       offset: const Offset(0, 4),
+                              //                       blurRadius: 8,
+                              //                       spreadRadius: 2)
+                              //                 ],
+                              //                 color: Colors.white),
+                              //             child: const Text(
+                              //               'Select',
+                              //               style: TextStyle(
+                              //                 fontFamily: "Avenir LT Std",
+                              //                 color: Color(0xFF4682B4),
+                              //                 fontSize: 20,
+                              //                 fontWeight: FontWeight.bold,
+                              //               ),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       )
+                              //     ],
+                              //   ),
+                              // ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                  height: 100,
+                                  width: size.width,
+                                  alignment: Alignment.topLeft,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Phone",
+                                        style: TextStyle(
+                                          fontFamily: "Avenir LT Std",
+                                          color: Color(0xFFB8B8B8),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      IntlPhoneField(
+                                        decoration: const InputDecoration(
+                                          counterStyle: TextStyle(fontSize: 0),
+                                          // labelText: 'Phone',
+                                          // labelStyle: TextStyle(
+                                          //   fontFamily: "Avenir LT Std",
+                                          //   color: Color(0xFFB8B8B8),
+                                          //   fontSize: 16,
+                                          // ),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(width: 20),
+                                          ),
+                                        ),
+                                        initialCountryCode: countrycode,
+                                        initialValue: numb,
+                                        onChanged: (phone) {
+                                          countrycode =
+                                              phone.countryISOCode.toString();
+                                          numb = phone.number.toString();
+                                        },
+                                      ),
+                                    ],
+                                  )),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              const Text(
+                                "Disease Information",
+                                style: TextStyle(
+                                  fontFamily: "Avenir LT Std",
+                                  color: Color(0xFF4682B4),
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              // const SizedBox(
+                              //   height: 16,
+                              // ),
+                              // const Text(
+                              //   "Select condition.",
+                              //   style: TextStyle(
+                              //     fontFamily: "Avenir LT Std",
+                              //     color: Color(0xFFB8B8B8),
+                              //     fontSize: 14,
+                              //   ),
+                              // ),
+                              // Container(
+                              //   padding: const EdgeInsets.only(
+                              //       left: 16.0, right: 16.0),
+                              //   decoration: const BoxDecoration(
+                              //     border: Border(
+                              //       bottom:
+                              //           BorderSide(color: Colors.grey, width: 1),
+                              //     ),
+                              //   ),
+                              //   child: DropdownButtonHideUnderline(
+                              //     child: DropdownButton(
+                              //       hint: const Text('Condition'),
+                              //       dropdownColor: Colors.white,
+                              //       elevation: 5,
+                              //       icon: const Icon(
+                              //         Icons.arrow_drop_down,
+                              //         color: Colors.blue,
+                              //       ),
+                              //       iconSize: 36.0,
+                              //       isExpanded: true,
+                              //       value: _disval,
+                              //       style: const TextStyle(
+                              //           color: Color(0xff2F3037), fontSize: 22.0),
+                              //       onChanged: (value) {
+                              //         setState(() {
+                              //           _disval = value.toString();
+                              //           grpnameset(_disval);
+                              //         });
+                              //       },
+                              //       items: disList.map((value) {
+                              //         return DropdownMenuItem(
+                              //           value: value,
+                              //           child: Text(
+                              //             value,
+                              //             style: const TextStyle(
+                              //               fontFamily: "Avenir LT Std",
+                              //               color: Color(0xFF000000),
+                              //               fontSize: 20,
+                              //             ),
+                              //           ),
+                              //         );
+                              //       }).toList(),
+                              //     ),
+                              //   ),
+                              // ),
+                              // const SizedBox(
+                              //   height: 16,
+                              // ),
+                              // const Text(
+                              //   "Select support group.",
+                              //   style: TextStyle(
+                              //     fontFamily: "Avenir LT Std",
+                              //     color: Color(0xFFB8B8B8),
+                              //     fontSize: 14,
+                              //   ),
+                              // ),
+                              // Container(
+                              //   padding: const EdgeInsets.only(
+                              //       left: 16.0, right: 16.0),
+                              //   decoration: const BoxDecoration(
+                              //     border: Border(
+                              //       bottom:
+                              //           BorderSide(color: Colors.grey, width: 1),
+                              //     ),
+                              //   ),
+                              //   child: DropdownButtonHideUnderline(
+                              //     child: DropdownButton(
+                              //       hint: const Text('Group'),
+                              //       dropdownColor: Colors.white,
+                              //       elevation: 5,
+                              //       icon: const Icon(
+                              //         Icons.arrow_drop_down,
+                              //         color: Colors.blue,
+                              //       ),
+                              //       iconSize: 36.0,
+                              //       isExpanded: true,
+                              //       value: grpval,
+                              //       style: const TextStyle(
+                              //           color: Color(0xff2F3037), fontSize: 22.0),
+                              //       onChanged: (value) {
+                              //         setState(() {
+                              //           grpidsearch(value.toString(), grpList);
+                              //           grpval = value.toString();
+                              //         });
+                              //       },
+                              //       items: grpname.map((value) {
+                              //         return DropdownMenuItem(
+                              //           value: value,
+                              //           child: Text(
+                              //             value,
+                              //             style: const TextStyle(
+                              //               fontFamily: "Avenir LT Std",
+                              //               color: Color(0xFF000000),
+                              //               fontSize: 20,
+                              //             ),
+                              //           ),
+                              //         );
+                              //       }).toList(),
+                              //     ),
+                              //   ),
+                              // ),
+                              Container(
+                                alignment: Alignment.center,
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(1900),
+                                      lastDate: DateTime(2025),
+                                    ).then((selectedDate) {
+                                      if (selectedDate != null) {
+                                        yearController.text =
+                                            DateFormat("yyyy-MM-dd")
+                                                .format(selectedDate);
+                                      }
+                                    });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Flexible(
+                                        child: TextFormField(
+                                          enabled: false,
+                                          style: const TextStyle(
+                                            fontFamily: "Avenir LT Std",
+                                            color: Color(0xFF000000),
+                                            fontSize: 20,
+                                          ),
+                                          decoration: const InputDecoration(
+                                            labelText: "Year of Diagnosis",
+                                            labelStyle: TextStyle(
+                                              fontFamily: "Avenir LT Std",
+                                              color: Color(0xFFB8B8B8),
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          keyboardType: TextInputType.name,
+                                          controller: yearController,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please Enter Year';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 50,
+                                      ),
+                                      Flexible(
+                                        child: InkWell(
+                                          onTap: () async {
+                                            await showDatePicker(
+                                              context: context,
+                                              initialDate: DateTime.now(),
+                                              firstDate: DateTime(1900),
+                                              lastDate: DateTime(2025),
+                                            ).then((selectedDate) {
+                                              if (selectedDate != null) {
+                                                yearController.text =
+                                                    DateFormat("yyyy-MM-dd")
+                                                        .format(selectedDate);
+                                              }
+                                            });
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 13),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(4)),
+                                                boxShadow: <BoxShadow>[
+                                                  BoxShadow(
+                                                      color: const Color(
+                                                              0xffB8B8B8)
+                                                          .withAlpha(100),
+                                                      offset:
+                                                          const Offset(0, 4),
+                                                      blurRadius: 8,
+                                                      spreadRadius: 2)
+                                                ],
+                                                color: Colors.white),
+                                            child: const Text(
+                                              'Select',
+                                              style: TextStyle(
+                                                fontFamily: "Avenir LT Std",
+                                                color: Color(0xFF4682B4),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // const SizedBox(
+                              //   height: 16,
+                              // ),
+                              // const Text(
+                              //   "Hospital",
+                              //   style: TextStyle(
+                              //     fontFamily: "Avenir LT Std",
+                              //     color: Color(0xFFB8B8B8),
+                              //     fontSize: 14,
+                              //   ),
+                              // ),
+                              // Container(
+                              //   padding: const EdgeInsets.only(
+                              //       left: 16.0, right: 16.0),
+                              //   decoration: const BoxDecoration(
+                              //     border: Border(
+                              //       bottom:
+                              //           BorderSide(color: Colors.grey, width: 1),
+                              //     ),
+                              //   ),
+                              //   child: DropdownButtonHideUnderline(
+                              //     child: DropdownButton(
+                              //       hint: const Text('Condition'),
+                              //       dropdownColor: Colors.white,
+                              //       elevation: 5,
+                              //       icon: const Icon(
+                              //         Icons.arrow_drop_down,
+                              //         color: Colors.blue,
+                              //       ),
+                              //       iconSize: 36.0,
+                              //       isExpanded: true,
+                              //       value: hospitalVal,
+                              //       style: const TextStyle(
+                              //           color: Color(0xff2F3037), fontSize: 22.0),
+                              //       onChanged: (value) {
+                              //         setState(() {
+                              //           hospitalVal = value.toString();
+                              //         });
+                              //       },
+                              //       items: hospitalList.map((value) {
+                              //         return DropdownMenuItem(
+                              //           value: value,
+                              //           child: Text(
+                              //             value,
+                              //             style: const TextStyle(
+                              //               fontFamily: "Avenir LT Std",
+                              //               color: Color(0xFF000000),
+                              //               fontSize: 20,
+                              //             ),
+                              //           ),
+                              //         );
+                              //       }).toList(),
+                              //     ),
+                              //   ),
+                              // ),
+                              // const SizedBox(
+                              //   height: 10,
+                              // ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                child: TextFormField(
+                                  style: const TextStyle(
+                                    fontFamily: "Avenir LT Std",
+                                    color: Color(0xFF000000),
+                                    fontSize: 20,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    labelText: "Hospital",
+                                    labelStyle: TextStyle(
+                                      fontFamily: "Avenir LT Std",
+                                      color: Color(0xFFB8B8B8),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.name,
+                                  controller: hospitalController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please Enter Hospital';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                child: TextFormField(
+                                  style: const TextStyle(
+                                    fontFamily: "Avenir LT Std",
+                                    color: Color(0xFF000000),
+                                    fontSize: 20,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    labelText: "Medications",
+                                    labelStyle: TextStyle(
+                                      fontFamily: "Avenir LT Std",
+                                      color: Color(0xFFB8B8B8),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.emailAddress,
+                                  controller: medicationController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please Enter Medications';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                child: TextFormField(
+                                  style: const TextStyle(
+                                    fontFamily: "Avenir LT Std",
+                                    color: Color(0xFF000000),
+                                    fontSize: 20,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    labelText: "Doctor",
+                                    labelStyle: TextStyle(
+                                      fontFamily: "Avenir LT Std",
+                                      color: Color(0xFFB8B8B8),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.emailAddress,
+                                  controller: doctorController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please Enter Doctor';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 30,
+                              ),
+                              InkWell(
+                                onTap: () async {
+                                  await edit(
+                                    context,
+                                    nameController.text,
+                                    gender,
+                                    dateController.text,
+                                    countrycode,
+                                    numb,
+                                    yearController.text,
+                                    hospitalController.text,
+                                    medicationController.text,
+                                    doctorController.text,
+                                  );
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 13),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(4)),
+                                      boxShadow: <BoxShadow>[
+                                        BoxShadow(
+                                            color: const Color(0xffB8B8B8)
+                                                .withAlpha(100),
+                                            offset: const Offset(0, 4),
+                                            blurRadius: 8,
+                                            spreadRadius: 2)
+                                      ],
+                                      color: const Color(0xFF71B48D)),
+                                  child: const Text(
+                                    'SAVE',
+                                    style: TextStyle(
+                                      fontFamily: "Avenir LT Std",
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            }),
       // bottomNavigationBar: BottomNavigationBar(
       //   onTap: onTabTapped, // new
       //   selectedItemColor: const Color(0xFF71B48D),

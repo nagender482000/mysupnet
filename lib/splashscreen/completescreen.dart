@@ -63,19 +63,19 @@ class _FinalPageState extends State<FinalPage> {
             SizedBox(
               height: size.height * 0.25,
             ),
-            const Text(
-              "OUR FUNDERS",
-              style: TextStyle(
-                fontFamily: "Avenir LT Std",
-                color: Color(0xFFB8B8B8),
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 170),
-              child: Image.asset("assets/images/image001.png"),
-            ),
+            // const Text(
+            //   "OUR FUNDERS",
+            //   style: TextStyle(
+            //     fontFamily: "Avenir LT Std",
+            //     color: Color(0xFFB8B8B8),
+            //     fontSize: 10,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 170),
+            //   child: Image.asset("assets/images/image001.png"),
+            // ),
           ],
         ),
       ),

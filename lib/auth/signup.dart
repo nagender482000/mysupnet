@@ -107,6 +107,7 @@ class _SignupPageState extends State<SignupPage> {
       }
 
       grpname.clear();
+      grpname.add("Selected Group");
       for (i = 0; i < grpidList.length; i++) {
         grpname.add(grpidList[i]["name"]);
       }

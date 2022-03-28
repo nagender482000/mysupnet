@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mysupnet/Apicalls/addpost.dart';
+import 'package:mysupnet/Apicalls/editpost.dart';
 import 'package:mysupnet/drawer.dart';
 import 'package:mysupnet/home/feed.dart';
 
-class AddNewPost extends StatefulWidget {
-  const AddNewPost({Key? key}) : super(key: key);
+class EditPostPage extends StatefulWidget {
+  final String ptext;
+  final String id;
+
+  const EditPostPage({Key? key, required this.ptext, required this.id})
+      : super(key: key);
 
   @override
-  _AddNewPostState createState() => _AddNewPostState();
+  State<EditPostPage> createState() => _EditPostPageState();
 }
 
-class _AddNewPostState extends State<AddNewPost> {
+class _EditPostPageState extends State<EditPostPage> {
   final postController = TextEditingController();
 
   @override
@@ -19,6 +23,8 @@ class _AddNewPostState extends State<AddNewPost> {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
     ));
+    postController.text = widget.ptext;
+
     super.initState();
   }
 
@@ -31,7 +37,6 @@ class _AddNewPostState extends State<AddNewPost> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
     return Scaffold(
       endDrawer: const NavigationDrawerWidget(),
       backgroundColor: Colors.white,
@@ -114,7 +119,7 @@ class _AddNewPostState extends State<AddNewPost> {
                             ),
                           );
                         });
-                    await addpost(context, postController.text);
+                    await editpost(context, widget.id, postController.text);
                   },
                   child: Container(
                     width: MediaQuery.of(context).size.width,
@@ -132,7 +137,7 @@ class _AddNewPostState extends State<AddNewPost> {
                         ],
                         color: const Color(0xFF71B48D)),
                     child: const Text(
-                      'SHARE',
+                      'SAVE',
                       style: TextStyle(
                         fontFamily: "Avenir LT Std",
                         color: Colors.white,
@@ -147,53 +152,6 @@ class _AddNewPostState extends State<AddNewPost> {
           ),
         ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   currentIndex: 0,
-      //   items: [
-      //     BottomNavigationBarItem(
-      //       icon: GestureDetector(
-      //         onTap: () {
-      //           Navigator.of(context).push(MaterialPageRoute(
-      //             builder: (context) => const HomeFeedPage(),
-      //           ));
-      //         },
-      //         child: const Image(
-      //           image: AssetImage("assets/images/feed.png"),
-      //           color: null,
-      //         ),
-      //       ),
-      //       backgroundColor: null,
-      //       title: const Text("FEED",
-      //           style: TextStyle(
-      //             fontFamily: "Avenir LT Std",
-      //           )),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: GestureDetector(
-      //         child: const Image(
-      //           image: AssetImage("assets/images/inactivechat.png"),
-      //           color: null,
-      //         ),
-      //       ),
-      //       title: const Text("MENTORS",
-      //           style: TextStyle(
-      //             fontFamily: "Avenir LT Std",
-      //           )),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: GestureDetector(
-      //         child: const Image(
-      //           image: AssetImage("assets/images/inactivenew.png"),
-      //           color: null,
-      //         ),
-      //       ),
-      //       title: const Text("WHAT'S NEW",
-      //           style: TextStyle(
-      //             fontFamily: "Avenir LT Std",
-      //           )),
-      //     ),
-      //   ],
-      // ),
     );
   }
 }
@@ -247,7 +205,7 @@ class Topbar extends StatelessWidget {
                     width: size.width * 0.02,
                   ),
                 ),
-                const Text("ADD NEW POST",
+                const Text("EDIT POST",
                     style: TextStyle(
                       fontSize: 16,
                       color: Color(0xFF4682B4),
