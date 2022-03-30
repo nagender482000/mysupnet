@@ -51,11 +51,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     var headers = {'Authorization': 'Bearer ' + token.toString()};
     var request = http.MultipartRequest(
-        'GET', Uri.parse('https://apis.mysupnet.org/api/v1/user'));
+        'GET',
+        Uri.parse(
+            'https://apis.mysupnet.org/api/v1/user?email=' + widget.email));
     request.headers.addAll(headers);
-    request.fields.addAll({
-      "email": widget.email,
-    });
+
     http.StreamedResponse response = await request.send();
     var responsed = await http.Response.fromStream(response);
     final responseData = json.decode(responsed.body);
@@ -144,7 +144,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       ),
                                     ),
                                     Text(
-                                      "Born " + userdata["phone"],
+                                      "Born " + dob,
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         fontFamily: "Avenir LT Std",

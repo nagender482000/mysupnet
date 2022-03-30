@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mysupnet/blockpage/block.dart';
 import 'package:mysupnet/home/feed.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 splash(String? token, context) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  String email = prefs.getString('email').toString();
   var headers = {'Authorization': 'Bearer ' + token.toString()};
   var request = http.MultipartRequest(
-      'GET', Uri.parse('https://apis.mysupnet.org/api/v1/user'));
+      'GET', Uri.parse('https://apis.mysupnet.org/api/v1/user?email=' + email));
 
   request.headers.addAll(headers);
 

@@ -9,11 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 log(String email, String password, BuildContext context) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  // var headers = {'Authorization': 'Bearer ' + token.toString()};
   var request = http.MultipartRequest(
       'POST', Uri.parse('https://apis.mysupnet.org/api/v1/user/login'));
   request.fields.addAll({'email': email, 'password': password});
-  // request.headers.addAll(headers);
 
   http.StreamedResponse response = await request.send();
   var responsed = await http.Response.fromStream(response);
@@ -35,11 +33,16 @@ log(String email, String password, BuildContext context) async {
     if (message == "success") {
       String token = responseData["data"]["access_token"].toString();
       String id = responseData["data"]["user"]["id"].toString();
+
       prefs.setString('islogged', "true");
       prefs.setString('token', token);
       prefs.setString('id', id);
       String name = responseData["data"]["user"]["name"].toString();
+      String email = responseData["data"]["user"]["email"].toString();
+      prefs.setString('email', email);
+
       prefs.setString('name', name);
+
       splash(token, context);
     }
   } else if (responseData["status"] >= 400 && responseData["status"] <= 500) {

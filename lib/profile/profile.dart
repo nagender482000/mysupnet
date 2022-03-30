@@ -49,10 +49,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   profile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token').toString();
+    String email = prefs.getString('email').toString();
 
     var headers = {'Authorization': 'Bearer ' + token.toString()};
-    var request = http.MultipartRequest(
-        'GET', Uri.parse('https://apis.mysupnet.org/api/v1/user'));
+    var request = http.MultipartRequest('GET',
+        Uri.parse('https://apis.mysupnet.org/api/v1/user?email=' + email));
 
     request.headers.addAll(headers);
 

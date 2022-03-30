@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
-import 'package:mysupnet/home/feed.dart';
 import 'package:mysupnet/splashscreen/splashscreen.dart';
 
 void main() {
@@ -27,7 +26,7 @@ class MyApp extends StatelessWidget {
         ),
         primarySwatch: Colors.blue,
       ),
-      home: const HomeFeedPage(),
+      home: const SplashPage(),
     );
   }
 }

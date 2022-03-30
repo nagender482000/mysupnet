@@ -50,6 +50,8 @@ reg(
     prefs.setString('name', name);
     String id = responseData["data"]["user"]["id"].toString();
     prefs.setString('id', id);
+    String email = responseData["data"]["user"]["email"].toString();
+    prefs.setString('email', email);
 
     String message = responseData["detail"];
     // ignore: deprecated_member_use

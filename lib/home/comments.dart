@@ -12,12 +12,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CommentsSec extends StatefulWidget {
   late String id;
   late int index;
+  final bool vis;
   late List postdata;
   late Map<dynamic, dynamic> postdatamap;
   late List<dynamic> commentdata;
 
-  CommentsSec(
-      this.id, this.index, this.postdata, this.postdatamap, this.commentdata,
+  CommentsSec(this.id, this.index, this.postdata, this.postdatamap,
+      this.commentdata, this.vis,
       {Key? key})
       : super(key: key);
   @override
@@ -101,7 +102,7 @@ class _CommentsSecState extends State<CommentsSec> {
           int comments = widget.postdata[i]["comments"].length;
 
           widget.postdatamap[widget.postdata[i]["uuid"].toString()] = {
-            "postvis": true,
+            "postvis": widget.vis,
             "isliked": false,
             "lclickcount": 0,
             "bclickcount": 0,
@@ -111,6 +112,8 @@ class _CommentsSecState extends State<CommentsSec> {
             "commentscount": comments,
             "editvisible": false,
             "imgvisible": true,
+            "user_email": widget.postdata[i]["user_email"].toString()
+
           };
         }
       });
