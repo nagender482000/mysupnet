@@ -342,13 +342,21 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontFamily: "Avenir LT Std",
-                          color: Color(0xFF4078A6),
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => UserProfileScreen(
+                                    email: email,
+                                  )));
+                        },
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontFamily: "Avenir LT Std",
+                            color: Color(0xFF4078A6),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       Row(
@@ -384,18 +392,17 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                   const Spacer(),
                   !current
                       ? SizedBox(
-                          width: size.width * 0.2,
+                          width: size.width * 0.12,
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton(
+                              dropdownColor: Colors.white,
                               alignment: Alignment.centerRight,
                               iconSize: 0.0,
                               isExpanded: true,
                               value: fval,
-                              elevation: 2,
+                              elevation: 1,
                               borderRadius: BorderRadius.circular(10),
                               onChanged: (value) async {
-                                print(value);
-
                                 if (value == "Flag") {
                                   await flag(context, id, "post");
                                 }
@@ -410,7 +417,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                     style: const TextStyle(
                                       fontFamily: "Avenir LT Std",
                                       color: Color(0xFF000000),
-                                      fontSize: 16,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 );
@@ -422,15 +429,13 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                           width: size.width * 0.15,
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton(
-                              elevation: 2,
+                              elevation: 1,
                               borderRadius: BorderRadius.circular(10),
                               dropdownColor: Colors.white,
                               iconSize: 0.0,
                               isExpanded: true,
                               value: cval,
                               onChanged: (value) async {
-                                print(value);
-
                                 if (value == "Edit") {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => EditPostPage(
@@ -455,7 +460,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                     style: const TextStyle(
                                       fontFamily: "Avenir LT Std",
                                       color: Color(0xFF000000),
-                                      fontSize: 16,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 );
