@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mysupnet/Apicalls/logout.dart';
 import 'package:mysupnet/profile/profile.dart';
+import 'package:mysupnet/splashscreen/soon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,7 +25,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   int commentscount = 0;
   _sendMail() async {
     // Android and iOS
-    const uri = 'mailto:mkpsg@mysupnet.com?subject=Help&body=I%20need%20help!';
+    const uri = 'mailto:mkpsg@mysupnet.org?subject=Help&body=I%20need%20help!';
     if (await canLaunch(uri)) {
       await launch(uri);
     } else {
@@ -231,13 +232,13 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
 
     switch (index) {
       case 0:
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => const ProfileScreen(),
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const DisplayPage(),
         ));
         break;
       case 1:
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => const ProfileScreen(),
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const DisplayPage(),
         ));
         break;
       case 2:
@@ -247,8 +248,8 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
         // ));
         break;
       case 3:
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => const ProfileScreen(),
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const DisplayPage(),
         ));
         break;
       case 4:

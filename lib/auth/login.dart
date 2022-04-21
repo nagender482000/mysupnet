@@ -15,8 +15,6 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   late bool _isObscure = true;
 
- 
-
   final passwordController = TextEditingController();
 
   @override

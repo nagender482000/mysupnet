@@ -23,8 +23,8 @@
   </intent>
 </queries>
    <application
-        android:label="untitled"
-        android:icon="@mipmap/ic_launcher">
+        android:label="MySupNet"
+        android:icon="@mipmap/logo">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

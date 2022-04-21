@@ -15,6 +15,7 @@ import 'package:mysupnet/home/editpostpage.dart';
 import 'package:mysupnet/home/newpost.dart';
 import 'package:http/http.dart' as http;
 import 'package:mysupnet/home/user.dart';
+import 'package:mysupnet/splashscreen/soon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeFeedPage extends StatefulWidget {
@@ -219,38 +220,44 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: size.height * .65,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: const ScrollPhysics(),
-                          padding: EdgeInsets.zero,
-                          itemCount: postdata.length,
-                          itemBuilder: (context, index) {
-                            String id = postdata[index]["uuid"].toString();
-                            String psname =
-                                postdata[index]["user_name"].toString();
-                            return Card(
-                                child: Column(children: [
-                              Stack(children: [
-                                post(
-                                  size,
-                                  psname,
-                                  postdata[index]["text"].toString(),
-                                  postdatamap[id]["commentscount"],
-                                  postdatamap[id]["likecount"],
-                                  index,
-                                  TimeAgo.timeAgoSinceDate(
-                                      DateTime.parse(postdata[index]["created"])
-                                          .toString()),
-                                  postdata[index]["user_condition"].toString(),
-                                  postdata[index]["uuid"].toString(),
-                                  postdata[index]["current_user_post"],
-                                  postdatamap[id]["user_email"],
-                                ),
-                              ])
-                            ]));
-                          },
+                      RefreshIndicator(
+                        onRefresh: () {
+                          return getpost();
+                        },
+                        child: SizedBox(
+                          height: size.height * .65,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: const ScrollPhysics(),
+                            padding: EdgeInsets.zero,
+                            itemCount: postdata.length,
+                            itemBuilder: (context, index) {
+                              String id = postdata[index]["uuid"].toString();
+                              String psname =
+                                  postdata[index]["user_name"].toString();
+                              return Card(
+                                  child: Column(children: [
+                                Stack(children: [
+                                  post(
+                                    size,
+                                    psname,
+                                    postdata[index]["text"].toString(),
+                                    postdatamap[id]["commentscount"],
+                                    postdatamap[id]["likecount"],
+                                    index,
+                                    TimeAgo.timeAgoSinceDate(DateTime.parse(
+                                            postdata[index]["created"])
+                                        .toString()),
+                                    postdata[index]["user_condition"]
+                                        .toString(),
+                                    postdata[index]["uuid"].toString(),
+                                    postdata[index]["current_user_post"],
+                                    postdatamap[id]["user_email"],
+                                  ),
+                                ])
+                              ]));
+                            },
+                          ),
                         ),
                       ),
                     ],
@@ -267,7 +274,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
           BottomNavigationBarItem(
             icon: GestureDetector(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => const HomeFeedPage(),
                 ));
               },
@@ -281,6 +288,11 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
           ),
           BottomNavigationBarItem(
             icon: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const DisplayPage(),
+                ));
+              },
               child: const Image(
                 image: AssetImage("assets/images/inactivechat.png"),
                 color: null,
@@ -290,6 +302,11 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
           ),
           BottomNavigationBarItem(
             icon: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const DisplayPage(),
+                ));
+              },
               child: const Image(
                 image: AssetImage("assets/images/inactivenew.png"),
                 color: null,
@@ -417,7 +434,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                     style: const TextStyle(
                                       fontFamily: "Avenir LT Std",
                                       color: Color(0xFF000000),
-                                      fontSize: 14,
+                                      fontSize: 18,
                                     ),
                                   ),
                                 );
@@ -460,7 +477,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                     style: const TextStyle(
                                       fontFamily: "Avenir LT Std",
                                       color: Color(0xFF000000),
-                                      fontSize: 14,
+                                      fontSize: 18,
                                     ),
                                   ),
                                 );
@@ -895,12 +912,12 @@ class Topbar extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                GestureDetector(
-                  onTap: () {},
-                  child: Image.asset(
-                    "assets/images/addec5a8-1f71-4772-96f0-843755aaaed1.png",
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () {},
+                //   child: Image.asset(
+                //     "assets/images/addec5a8-1f71-4772-96f0-843755aaaed1.png",
+                //   ),
+                // ),
                 GestureDetector(
                   onTap: () {
                     Scaffold.of(context).openEndDrawer();
