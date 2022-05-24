@@ -113,7 +113,6 @@ class _CommentsSecState extends State<CommentsSec> {
             "editvisible": false,
             "imgvisible": true,
             "user_email": widget.postdata[i]["user_email"].toString()
-
           };
         }
       });
@@ -235,14 +234,10 @@ class _CommentsSecState extends State<CommentsSec> {
                           isloading = false;
                         });
                       },
-                      icon: const Icon(Icons.add_comment),
+                      icon: const Icon(Icons.send),
                     ),
                   ],
                 ),
-              ),
-              Container(
-                color: const Color(0xFFF6F6F6),
-                height: 10,
               ),
             ],
           );
@@ -309,9 +304,9 @@ class _CommentsSecState extends State<CommentsSec> {
                                     commenttext,
                                     style: const TextStyle(
                                       fontFamily: "Avenir LT Std",
-                                      color: Color(0xFF4078A6),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: 13,
+                                      //fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),

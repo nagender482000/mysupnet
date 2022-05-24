@@ -101,9 +101,9 @@ class _BlockPageState extends State<BlockPage> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).push(
-                                        CustomPageRoute(const HomeFeedPage()));
+                                    // Navigator.of(context).pop();
+                                    // Navigator.of(context).push(
+                                    //     CustomPageRoute(const HomeFeedPage()));
                                   },
                                   child: Container(
                                     width: MediaQuery.of(context).size.width,

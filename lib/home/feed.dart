@@ -30,11 +30,11 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
   final commentController = TextEditingController();
   bool isloading = true;
   List postdata = [];
-  String cval = ":";
-  String fval = ":";
+  String cval = "drop.png";
+  String fval = "drop.png";
 
-  List<String> clist = [":", "Edit", "Delete"];
-  List<String> flist = [":", "Flag"];
+  List<String> clist = ["drop.png", "edit.jpg", "delete.jpg"];
+  List<String> flist = ["drop.png", "flag.jpg"];
 
   List<dynamic> commentdata = [];
   String name = "";
@@ -226,36 +226,44 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                         },
                         child: SizedBox(
                           height: size.height * .65,
-                          child: ListView.builder(
+                          child: ListView.separated(
                             shrinkWrap: true,
                             physics: const ScrollPhysics(),
                             padding: EdgeInsets.zero,
                             itemCount: postdata.length,
+                            separatorBuilder: (context, index) {
+                              return const Divider(
+                                thickness: 10,
+                                height: 10,
+                                color: Color(0xFFF6F6F6),
+                              );
+                            },
                             itemBuilder: (context, index) {
                               String id = postdata[index]["uuid"].toString();
                               String psname =
                                   postdata[index]["user_name"].toString();
                               return Card(
+                                  elevation: 0,
                                   child: Column(children: [
-                                Stack(children: [
-                                  post(
-                                    size,
-                                    psname,
-                                    postdata[index]["text"].toString(),
-                                    postdatamap[id]["commentscount"],
-                                    postdatamap[id]["likecount"],
-                                    index,
-                                    TimeAgo.timeAgoSinceDate(DateTime.parse(
-                                            postdata[index]["created"])
-                                        .toString()),
-                                    postdata[index]["user_condition"]
-                                        .toString(),
-                                    postdata[index]["uuid"].toString(),
-                                    postdata[index]["current_user_post"],
-                                    postdatamap[id]["user_email"],
-                                  ),
-                                ])
-                              ]));
+                                    Stack(children: [
+                                      post(
+                                        size,
+                                        psname,
+                                        postdata[index]["text"].toString(),
+                                        postdatamap[id]["commentscount"],
+                                        postdatamap[id]["likecount"],
+                                        index,
+                                        TimeAgo.timeAgoSinceDate(DateTime.parse(
+                                                postdata[index]["created"])
+                                            .toString()),
+                                        postdata[index]["user_condition"]
+                                            .toString(),
+                                        postdata[index]["uuid"].toString(),
+                                        postdata[index]["current_user_post"],
+                                        postdatamap[id]["user_email"],
+                                      ),
+                                    ])
+                                  ]));
                             },
                           ),
                         ),
@@ -409,7 +417,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                   const Spacer(),
                   !current
                       ? SizedBox(
-                          width: size.width * 0.12,
+                          width: size.width * 0.3,
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton(
                               dropdownColor: Colors.white,
@@ -420,7 +428,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                               elevation: 1,
                               borderRadius: BorderRadius.circular(10),
                               onChanged: (value) async {
-                                if (value == "Flag") {
+                                if (value == "flag.jpg") {
                                   await flag(context, id, "post");
                                 }
                               },
@@ -428,15 +436,19 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                 return DropdownMenuItem(
                                   alignment: Alignment.centerRight,
                                   value: value,
-                                  child: Text(
-                                    value,
-                                    textAlign: TextAlign.end,
-                                    style: const TextStyle(
-                                      fontFamily: "Avenir LT Std",
-                                      color: Color(0xFF000000),
-                                      fontSize: 18,
-                                    ),
-                                  ),
+
+                                  child: Image.asset("assets/images/" + value,
+                                      height: 20, fit: BoxFit.contain),
+
+                                  // Text(
+                                  //   value,
+                                  //   textAlign: TextAlign.end,
+                                  //   style: const TextStyle(
+                                  //     fontFamily: "Avenir LT Std",
+                                  //     color: Color(0xFF000000),
+                                  //     fontSize: 18,
+                                  //   ),
+                                  // ),
                                 );
                               }).toList(),
                             ),
@@ -453,14 +465,14 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                               isExpanded: true,
                               value: cval,
                               onChanged: (value) async {
-                                if (value == "Edit") {
+                                if (value == "edit.jpg") {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => EditPostPage(
                                             ptext: posttext.toString(),
                                             id: id,
                                           )));
                                 }
-                                if (value == "Delete") {
+                                if (value == "delete.jpg") {
                                   await delpost(context, id);
                                   setState(() {
                                     postdatamap[id]["postvis"] = false;
@@ -471,15 +483,19 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                 return DropdownMenuItem(
                                   alignment: Alignment.centerRight,
                                   value: value,
-                                  child: Text(
-                                    value,
-                                    textAlign: TextAlign.end,
-                                    style: const TextStyle(
-                                      fontFamily: "Avenir LT Std",
-                                      color: Color(0xFF000000),
-                                      fontSize: 18,
-                                    ),
+                                  child: Image.asset(
+                                    "assets/images/" + value,
+                                    height: 20,
                                   ),
+                                  // Text(
+                                  //   value,
+                                  //   textAlign: TextAlign.end,
+                                  //   style: const TextStyle(
+                                  //     fontFamily: "Avenir LT Std",
+                                  //     color: Color(0xFF000000),
+                                  //     fontSize: 18,
+                                  //   ),
+                                  // ),
                                 );
                               }).toList(),
                             ),
@@ -945,7 +961,7 @@ class TimeAgo {
     final difference = date2.difference(notificationDate);
 
     if (difference.inDays > 8) {
-      return DateFormat("yyyy-MM-dd")
+      return DateFormat("dd-MM-yyyy")
           .format(DateTime.parse(dateString.toString()))
           .toString();
     } else if ((difference.inDays / 7).floor() >= 1) {

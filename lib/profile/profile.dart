@@ -72,7 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     if (userdata["date_of_birth"] != null) {
-      dob = DateFormat("yyyy-MM-dd")
+      dob = DateFormat("dd-MM-yyyy")
           .format(DateTime.parse(userdata["date_of_birth"].toString()))
           .toString();
     } else {

@@ -345,7 +345,7 @@ class _SignupPageState extends State<SignupPage> {
                                         borderSide: BorderSide(width: 20),
                                       ),
                                     ),
-                                    initialCountryCode: 'IN',
+                                    initialCountryCode: 'SG',
                                     onChanged: (phone) {
                                       country_code =
                                           phone.countryISOCode.toString();
