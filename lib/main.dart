@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
+import 'package:mysupnet/home/feed.dart';
 import 'package:mysupnet/splashscreen/splashscreen.dart';
 
 void main() {
@@ -20,7 +21,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'MySupNet',
       debugShowCheckedModeBanner: false,
+      darkTheme:ThemeData(),
       theme: ThemeData(
+        
         appBarTheme: const AppBarTheme(
           systemOverlayStyle: SystemUiOverlayStyle.dark,
         ),

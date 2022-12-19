@@ -5,7 +5,8 @@ import 'package:mysupnet/drawer.dart';
 import 'package:mysupnet/home/feed.dart';
 
 class AddNewPost extends StatefulWidget {
-  const AddNewPost({Key? key}) : super(key: key);
+  final Widget img;
+  const AddNewPost({Key? key, required this.img}) : super(key: key);
 
   @override
   _AddNewPostState createState() => _AddNewPostState();
@@ -59,9 +60,9 @@ class _AddNewPostState extends State<AddNewPost> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Flexible(
-                            child: CircleAvatar(
-                              radius: 25,
-                              child: Image.asset("assets/images/user.png"),
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: widget.img,
                             ),
                           ),
                           const SizedBox(
@@ -80,7 +81,7 @@ class _AddNewPostState extends State<AddNewPost> {
                                 decoration: const InputDecoration(
                                   hintText: "|What's on your mind?",
                                   contentPadding: EdgeInsets.symmetric(
-                                    vertical: 20,
+                                    vertical: 5,
                                   ),
                                   border: InputBorder.none,
                                 ),

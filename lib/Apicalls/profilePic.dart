@@ -1,30 +1,23 @@
-import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-likeapi(
-  context,
-  String id,
-  String type,
-) async {
+profilepic(file) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String token = prefs.getString('token').toString();
   var headers = {'Authorization': 'Bearer ' + token.toString()};
+
   var request = http.MultipartRequest(
-      'POST', Uri.parse("https://apis.mysupnet.org/api/v1/like"));
+      'POST', Uri.parse("https://apis.mysupnet.org/api/v1/user/image"));
+  request.files
+      .add(await http.MultipartFile.fromPath('image', file));
   request.headers.addAll(headers);
 
-  request.fields.addAll({
-    'object_uuid': id,
-    'object_type': type,
-  });
-
   http.StreamedResponse response = await request.send();
-  var responsed = await http.Response.fromStream(response);
-  final responseData = json.decode(responsed.body);
   if (response.statusCode == 200) {
-    return (responseData["data"]);
+    Fluttertoast.showToast(msg: "Uploaded.");
+    print(await response.stream.bytesToString());
   } else {
-    return (responseData["detail"]);
+    print(response.reasonPhrase);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mysupnet/Apicalls/log.dart';
-import 'package:mysupnet/auth/forgot.dart';
+import 'package:mysupnet/auth/femail.dart';
 import 'package:mysupnet/auth/signup.dart';
 import 'package:mysupnet/fadetransition.dart';
 
@@ -151,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                               isScrollControlled: true,
                               backgroundColor: Colors.transparent,
                               builder: (BuildContext bc) {
-                                return const ForgotBottomSheet();
+                                return const ForgotEmailBottomSheet();
                               });
                         },
                         child: const Text(

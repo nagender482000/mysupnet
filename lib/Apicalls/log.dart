@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:mysupnet/Apicalls/splash.dart';
 
@@ -17,59 +18,36 @@ log(String email, String password, BuildContext context) async {
   var responsed = await http.Response.fromStream(response);
 
   final responseData = json.decode(responsed.body);
+  print(responseData);
   if (responseData["status"] >= 200 && responseData["status"] <= 400) {
     String message = responseData["detail"];
     // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(
-        message,
-        style: const TextStyle(
-          fontFamily: "Avenir LT Std",
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-    ));
+    Fluttertoast.showToast(msg: message);
+
     if (message == "success") {
       String token = responseData["data"]["access_token"].toString();
       String id = responseData["data"]["user"]["id"].toString();
-
       prefs.setString('islogged', "true");
       prefs.setString('token', token);
       prefs.setString('id', id);
       String name = responseData["data"]["user"]["name"].toString();
       String email = responseData["data"]["user"]["email"].toString();
+      String img = responseData["data"]["user"]["photo"].toString();
+
       prefs.setString('email', email);
 
       prefs.setString('name', name);
+      prefs.setString('img', img);
 
       splash(token, context);
     }
   } else if (responseData["status"] >= 400 && responseData["status"] <= 500) {
     String message = responseData["detail"];
     // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(
-        message,
-        style: const TextStyle(
-          fontFamily: "Avenir LT Std",
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-    ));
+    Fluttertoast.showToast(msg: message.toString());
   } else {
     String message = responseData["detail"];
     // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(
-        message,
-        style: const TextStyle(
-          fontFamily: "Avenir LT Std",
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-    ));
+    Fluttertoast.showToast(msg: message.toString());
   }
 }

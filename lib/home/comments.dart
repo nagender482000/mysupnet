@@ -5,6 +5,7 @@ import 'package:mysupnet/Apicalls/addcomment.dart';
 import 'package:http/http.dart' as http;
 import 'package:mysupnet/Apicalls/likeapi.dart';
 import 'package:mysupnet/Apicalls/unlikeapi.dart';
+import 'package:mysupnet/global.dart';
 import 'package:mysupnet/home/feed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,7 +14,7 @@ class CommentsSec extends StatefulWidget {
   late String id;
   late int index;
   final bool vis;
-  late List postdata;
+  late var postdata;
   late Map<dynamic, dynamic> postdatamap;
   late List<dynamic> commentdata;
 
@@ -28,7 +29,10 @@ class CommentsSec extends StatefulWidget {
 class _CommentsSecState extends State<CommentsSec> {
   Map<dynamic, dynamic> commentdatamap = {};
   int lcc = 0;
-
+  Widget img = CircleAvatar(
+      backgroundImage: AssetImage(
+    "assets/images/user.png",
+  ));
   final commentController = TextEditingController();
   bool isloading = true;
 
@@ -52,12 +56,29 @@ class _CommentsSecState extends State<CommentsSec> {
     });
   }
 
+  setupimg() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String uimg = prefs.getString('img').toString();
+    print(widget.postdatamap);
+    uimg != "null"
+        ? img = CircleAvatar(
+            radius: 25, backgroundImage: NetworkImage(baseurl + uimg))
+        : img = CircleAvatar(
+            radius: 25,
+            backgroundImage: AssetImage(
+              "assets/images/user.png",
+            ));
+
+    print(widget.commentdata);
+  }
+
   String name = "";
   @override
   void initState() {
     setState(() {
       isloading = true;
     });
+    setupimg();
     super.initState();
 
     setState(() {
@@ -79,11 +100,18 @@ class _CommentsSecState extends State<CommentsSec> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token').toString();
     name = prefs.getString('name').toString();
-
+    String uimg = prefs.getString('img').toString();
+    print(uimg);
+    uimg != "null"
+        ? img = CircleAvatar(
+            radius: 25, backgroundImage: NetworkImage(baseurl + uimg))
+        : img = CircleAvatar(
+            radius: 25,
+            backgroundImage: AssetImage(
+              "assets/images/user.png",
+            ));
     var headers = {
-      'Authorization':
-          // 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQyMzg0NjUwLCJpYXQiOjE2NDEwODg2NTAsImp0aSI6IjBhZjQxMjlkNjU0NjQ4YmFiMWE4ZTAxMmM3MGUzZWUxIiwidXNlcl9pZCI6NDcsIm5hbWUiOiJkZWVwaWthYSBzdWJyYW1hbmlhbSIsInN1cHBvcnRfZ3JvdXBfaWQiOjMsInN1cHBvcnRfZ3JvdXBfbmFtZSI6Imdyb3VwMTAiLCJpc19zdXBlcl9hZG1pbiI6ZmFsc2UsImlzX2FkbWluX3VzZXIiOnRydWV9.YZcUWPvRBBHMN75YPCN27oI5efWwIA0ysY73cZ_GS_A'
-          'Bearer ' + token.toString(),
+      'Authorization': 'Bearer ' + token.toString(),
     };
     var request = http.MultipartRequest(
         'GET', Uri.parse('https://apis.mysupnet.org/api/v1/post/all'));
@@ -93,29 +121,42 @@ class _CommentsSecState extends State<CommentsSec> {
     http.StreamedResponse response = await request.send();
     var responsed = await http.Response.fromStream(response);
     final responseData = json.decode(responsed.body);
-
     if (response.statusCode == 200) {
-      setState(() {
-        widget.postdata = responseData["data"];
-        for (int i = 0; i < widget.postdata.length; i++) {
-          int likes = widget.postdata[i]["likes"];
-          int comments = widget.postdata[i]["comments"].length;
+      widget.postdata = responseData["data"];
+      for (int i = 0; i < widget.postdata.length; i++) {
+        int likes = widget.postdata[i]["likes"];
+        int comments = widget.postdata[i]["comments"].length;
 
-          widget.postdatamap[widget.postdata[i]["uuid"].toString()] = {
-            "postvis": widget.vis,
-            "isliked": false,
-            "lclickcount": 0,
-            "bclickcount": 0,
-            "isbookmarked": false,
-            "isvisible": false,
-            "likecount": likes,
-            "commentscount": comments,
-            "editvisible": false,
-            "imgvisible": true,
-            "user_email": widget.postdata[i]["user_email"].toString()
-          };
-        }
-      });
+        widget.postdatamap[widget.postdata[i]["uuid"].toString()] = {
+          "postvis": true,
+          "isliked": widget.postdata[i]["current_user_has_liked"],
+          "lclickcount": widget.postdata[i]["current_user_has_liked"] ? 1 : 0,
+          "bclickcount":
+              widget.postdata[i]["current_user_has_bookmarked"] ? 1 : 0,
+          "isbookmarked": widget.postdata[i]["current_user_has_bookmarked"],
+          "isvisible": false,
+          "likecount": likes,
+          "commentscount": comments,
+          "editvisible": false,
+          "imgvisible": true,
+          "user_email": widget.postdata[i]["user_email"].toString()
+        };
+        widget.postdata[i]["photo"] != null
+            ? widget.postdatamap[widget.postdata[i]["uuid"].toString()]
+                    ["photo"] =
+                CircleAvatar(
+                    radius: 25,
+                    backgroundImage: NetworkImage(
+                        baseurl + widget.postdata[i]["photo"].toString()))
+            : widget.postdatamap[widget.postdata[i]["uuid"].toString()]["photo"] =
+                CircleAvatar(
+                    radius: 25,
+                    backgroundImage: NetworkImage(
+                      "assets/images/user.png",
+                    ));
+
+        //postdatamap[[postdata[i]["uuid"].toString()].toString()] = {};
+      }
     } else {
       return responseData["detail"];
     }
@@ -160,12 +201,12 @@ class _CommentsSecState extends State<CommentsSec> {
                         widget.commentdata[0][i]["user_name"].toString(),
                         widget.commentdata[0][i]["text"].toString(),
                         widget.postdatamap[widget.id]["isvisible"],
-                        //widget.postdata[widget.index]["comments"].length,
                         widget.commentdata[0][i]["likes"],
                         TimeAgo.timeAgoSinceDate(
                             DateTime.parse(widget.commentdata[0][i]["created"])
                                 .toString()),
                         i,
+                        widget.commentdata[0][i]["user_photo"].toString(),
                       ),
                     ]);
                   }
@@ -193,7 +234,7 @@ class _CommentsSecState extends State<CommentsSec> {
                   children: [
                     CircleAvatar(
                       radius: 25,
-                      child: Image.asset("assets/images/user.png"),
+                      child: img,
                     ),
                     const SizedBox(
                       width: 20,
@@ -228,7 +269,8 @@ class _CommentsSecState extends State<CommentsSec> {
                         });
                         await addcomment(
                             context, widget.id, commentController.text);
-                        updatecomment(widget.id, commentController.text, 0);
+                        await updatecomment(
+                            widget.id, commentController.text, 0);
                         commentController.text = "";
                         setState(() {
                           isloading = false;
@@ -244,16 +286,31 @@ class _CommentsSecState extends State<CommentsSec> {
   }
 
   Column comments(
-    Size size,
-    String cid,
-    String commentname,
-    String commenttext,
-    bool viewVisible,
-    //int commentscount,
-    likes,
-    hrs,
-    i,
-  ) {
+      Size size,
+      String cid,
+      String commentname,
+      String commenttext,
+      bool viewVisible,
+      //int commentscount,
+      likes,
+      hrs,
+      i,
+      photo) {
+    Widget userpic = CircleAvatar(
+        radius: 25,
+        backgroundImage: NetworkImage(
+          "assets/images/user.png",
+        ));
+    photo != "null"
+        ? userpic = CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(
+                baseurl + widget.commentdata[0][i]["user_photo"].toString()))
+        : userpic = CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(
+              "assets/images/user.png",
+            ));
     return Column(children: [
       SizedBox(
           child: SizedBox(
@@ -270,10 +327,7 @@ class _CommentsSecState extends State<CommentsSec> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          radius: 20,
-                          child: Image.asset("assets/images/user.png"),
-                        ),
+                        userpic,
                         const SizedBox(
                           width: 20,
                         ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mysupnet/drawer.dart';
+import 'package:mysupnet/global.dart';
 import 'package:mysupnet/home/feed.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +23,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   var isLoading = true;
   String dob = "";
   String year = "";
+  Widget img = CircleAvatar(
+      radius: 50,
+      backgroundImage: AssetImage(
+        "assets/images/user.png",
+      ));
   void onTabTapped(int index) {
     setState(() {});
   }
@@ -59,8 +65,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     http.StreamedResponse response = await request.send();
     var responsed = await http.Response.fromStream(response);
     final responseData = json.decode(responsed.body);
+    print(responseData);
     if (response.statusCode == 200) {
       userdata = responseData["data"];
+      userdata["photo"] != null
+          ? img = CircleAvatar(
+              radius: 50,
+              backgroundImage:
+                  NetworkImage(baseurl + userdata["photo"].toString()))
+          : CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage(
+                "assets/images/user.png",
+              ));
     } else {
       return responseData["detail"];
     }
@@ -108,13 +125,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           children: [
                             Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 50,
-                                  child: Image.asset(
-                                    "assets/images/user.png",
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                                Flexible(child: img),
                                 const SizedBox(
                                   width: 10,
                                 ),

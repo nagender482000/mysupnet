@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mysupnet/Apicalls/forgotapi.dart';
 
-class ForgotBottomSheet extends StatefulWidget {
-  const ForgotBottomSheet({Key? key}) : super(key: key);
+class ForgotEmailBottomSheet extends StatefulWidget {
+  const ForgotEmailBottomSheet({Key? key}) : super(key: key);
 
   @override
-  _ForgotBottomSheetState createState() => _ForgotBottomSheetState();
+  _ForgotEmailBottomSheetState createState() => _ForgotEmailBottomSheetState();
 }
 
-class _ForgotBottomSheetState extends State<ForgotBottomSheet> {
+class _ForgotEmailBottomSheetState extends State<ForgotEmailBottomSheet> {
   final emailController = TextEditingController();
   bool isloading = false;
   @override
@@ -82,7 +82,7 @@ class _ForgotBottomSheetState extends State<ForgotBottomSheet> {
                     setState(() {
                       isloading = true;
                     });
-                    await forgot(context, emailController.text);
+                    await femail(context, emailController.text);
                     setState(() {
                       isloading = false;
                     });

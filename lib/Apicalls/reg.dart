@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:mysupnet/blockpage/block.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -52,19 +53,17 @@ reg(
     prefs.setString('id', id);
     String email = responseData["data"]["user"]["email"].toString();
     prefs.setString('email', email);
-
+    String img = responseData["data"]["user"]["photo"].toString();
+    prefs.setString('img', img);
     String message = responseData["detail"];
-    // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(
-        message,
-        style: const TextStyle(
-          fontFamily: "Avenir LT Std",
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-    ));
+    Fluttertoast.showToast(msg: message);
+    // message,
+    // style: const TextStyle(
+    //   fontFamily: "Avenir LT Std",
+    //   color: Colors.white,
+    //   fontSize: 16,
+    // ),
+
     if (message == "success") {
       Timer(const Duration(seconds: 3), () {
         Navigator.of(context).pop();
@@ -75,30 +74,14 @@ reg(
   } else if (responseData["status"] >= 400 && responseData["status"] <= 500) {
     String message = responseData["detail"];
     // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(
-        message,
-        style: const TextStyle(
-          fontFamily: "Avenir LT Std",
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-    ));
+    Fluttertoast.showToast(msg: message.toString());
+
     Navigator.of(context).pop();
   } else {
     String message = "Error not Defined.";
     // ignore: deprecated_member_use
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(
-        message,
-        style: const TextStyle(
-          fontFamily: "Avenir LT Std",
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-    ));
+    Fluttertoast.showToast(msg: message.toString());
+
     Navigator.of(context).pop();
   }
 }

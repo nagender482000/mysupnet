@@ -2,6 +2,8 @@
 
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -9,6 +11,8 @@ import 'package:intl/intl.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:mysupnet/Apicalls/edit.dart';
+import 'package:mysupnet/Apicalls/profilePic.dart';
+import 'package:mysupnet/global.dart';
 import 'package:mysupnet/profile/profile.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,17 +38,23 @@ class _EditPageState extends State<EditPage> {
   int _gradioSelected = 1;
   String gender = "";
   String countrycode = "";
-  List<bool> isSwitched = [
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-  ];
+  bool hide_email = false;
+  bool hide_gender = false;
+  bool hide_date_of_birth = false;
+  bool hide_phone = false;
+  bool hide_support_group = false;
+  bool hide_condition = false;
+  bool hide_year_of_diagnosis = false;
+  bool hide_hospital = false;
+  bool hide_medications = false;
+  bool hide_doctor = false;
+  Widget img = CircleAvatar(
+      radius: 50,
+      backgroundImage: AssetImage(
+        "assets/images/user.png",
+      ));
+  String sentdate = "";
+  String sentyear = "";
   TextEditingController emailController = TextEditingController();
 
   TextEditingController dateController = TextEditingController();
@@ -58,6 +68,17 @@ class _EditPageState extends State<EditPage> {
   TextEditingController nameController = TextEditingController();
 
   TextEditingController hospitalController = TextEditingController();
+  String formatISOTime(DateTime date) {
+    //converts date into the following format:
+// or 2019-06-04T12:08:56.235-0700
+    var duration = date.timeZoneOffset;
+    if (duration.isNegative)
+      return (DateFormat("yyyy-MM-ddTHH:mm:ss.mmm").format(date) +
+          "-${duration.inHours.toString().padLeft(2, '0')}${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}");
+    else
+      return (DateFormat("yyyy-MM-ddTHH:mm:ss.mmm").format(date) +
+          "+${duration.inHours.toString().padLeft(2, '0')}${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}");
+  }
 
   // String _disval = "Condition";
   // List<String> disList = ["Condition"];
@@ -103,12 +124,32 @@ class _EditPageState extends State<EditPage> {
     http.StreamedResponse response = await request.send();
     var responsed = await http.Response.fromStream(response);
     final responseData = json.decode(responsed.body);
-
+    print(responseData);
     if (response.statusCode == 200) {
       userdata = responseData["data"];
       name = userdata["name"].toString();
       nameController.text = name;
+      hide_email = userdata["hide_email"];
+      hide_gender = userdata["hide_gender"];
+      hide_date_of_birth = userdata["hide_date_of_birth"];
+      hide_phone = userdata["hide_phone"];
+      hide_support_group = userdata["hide_support_group"];
+      hide_condition = userdata["hide_condition"];
+      hide_year_of_diagnosis = userdata["hide_year_of_diagnosis"];
+      hide_hospital = userdata["hide_hospital"];
+      hide_medications = userdata["hide_medications"];
+      hide_doctor = userdata["hide_doctor"];
       gender = userdata["gender"].toString();
+      userdata["photo"] != null
+          ? img = CircleAvatar(
+              radius: 50,
+              backgroundImage:
+                  NetworkImage(baseurl + userdata["photo"].toString()))
+          : CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage(
+                "assets/images/user.png",
+              ));
       if (gender == "Male") {
         _gradioSelected = 1;
       } else {
@@ -118,6 +159,7 @@ class _EditPageState extends State<EditPage> {
       numb = userdata["phone"].toString();
       countrycode = userdata["country_code"].toString();
       if (userdata["date_of_birth"] != null) {
+        sentdate = formatISOTime(DateTime.parse(userdata["date_of_birth"]));
         date = DateFormat("dd-MM-yyyy")
             .format(DateTime.parse(userdata["date_of_birth"].toString()))
             .toString();
@@ -126,6 +168,7 @@ class _EditPageState extends State<EditPage> {
       }
       dateController.text = date;
       if (userdata["year_of_diagnosis"] != null) {
+        sentyear = formatISOTime(DateTime.parse(userdata["year_of_diagnosis"]));
         year = DateFormat("dd-MM-yyyy")
             .format(DateTime.parse(userdata["year_of_diagnosis"].toString()))
             .toString();
@@ -288,18 +331,56 @@ class _EditPageState extends State<EditPage> {
                             children: [
                               Row(
                                 children: [
-                                  CircleAvatar(
-                                    radius: 50,
-                                    child: Image.asset(
-                                      "assets/images/user.png",
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                                  Flexible(child: img),
                                   const SizedBox(
                                     width: 50,
                                   ),
                                   InkWell(
-                                    onTap: () {},
+                                    onTap: () async {
+                                      FilePickerResult? result =
+                                          await FilePicker.platform.pickFiles();
+
+                                      if (result != null) {
+                                        PlatformFile file = result.files.first;
+                                        print(file.name);
+                                        print(file.path);
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return Container(
+                                                child: AlertDialog(
+                                                  backgroundColor: Colors.white,
+                                                  content: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: const [
+                                                      CircularProgressIndicator
+                                                          .adaptive(),
+                                                      SizedBox(
+                                                        height: 20,
+                                                      ),
+                                                      Text(
+                                                        "Uploading...",
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 17,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                        await profilepic(file.path);
+                                        Navigator.pop(context);
+                                        setState(() {
+                                          if (file.path.toString() != "") {
+                                            img = Image.file(
+                                                File(file.path.toString()));
+                                          }
+                                        });
+                                      }
+                                    },
                                     child: Container(
                                       width: size.width * 0.4,
                                       padding: const EdgeInsets.symmetric(
@@ -384,19 +465,19 @@ class _EditPageState extends State<EditPage> {
                                           ),
                                           Switch(
                                             onChanged: (asd) {
-                                              if (isSwitched[0] == true) {
-                                                setState(() {
-                                                  isSwitched[0] = false;
-                                                });
-                                                print('Switch Button is OFF');
-                                              } else {
-                                                setState(() {
-                                                  isSwitched[0] = true;
-                                                });
-                                                print('Switch Button is ON');
-                                              }
+                                              // if (hide_name == true) {
+                                              //   setState(() {
+                                              //     isSwitched[0] = false;
+                                              //   });
+                                              //   print('Switch Button is OFF');
+                                              // } else {
+                                              //   setState(() {
+                                              //     isSwitched[0] = true;
+                                              //   });
+                                              //   print('Switch Button is ON');
+                                              // }
                                             },
-                                            value: isSwitched[0],
+                                            value: true,
                                             activeColor:
                                                 const Color(0xFF4682B4),
                                             activeTrackColor:
@@ -454,19 +535,19 @@ class _EditPageState extends State<EditPage> {
                                     Flexible(
                                       child: Switch(
                                         onChanged: (asc) {
-                                          if (isSwitched[1] == true) {
+                                          if (hide_email == true) {
                                             setState(() {
-                                              isSwitched[1] = false;
+                                              hide_email = false;
                                             });
                                             print('Switch Button is OFF');
                                           } else {
                                             setState(() {
-                                              isSwitched[1] = true;
+                                              hide_email = true;
                                             });
                                             print('Switch Button is ON');
                                           }
                                         },
-                                        value: isSwitched[1],
+                                        value: hide_email,
                                         activeColor: const Color(0xFF4682B4),
                                         activeTrackColor:
                                             const Color(0xFF4682B4),
@@ -551,19 +632,19 @@ class _EditPageState extends State<EditPage> {
                                     Flexible(
                                       child: Switch(
                                         onChanged: (asc) {
-                                          if (isSwitched[2] == true) {
+                                          if (hide_gender == true) {
                                             setState(() {
-                                              isSwitched[2] = false;
+                                              hide_gender = false;
                                             });
                                             print('Switch Button is OFF');
                                           } else {
                                             setState(() {
-                                              isSwitched[2] = true;
+                                              hide_gender = true;
                                             });
                                             print('Switch Button is ON');
                                           }
                                         },
-                                        value: isSwitched[2],
+                                        value: hide_gender,
                                         activeColor: const Color(0xFF4682B4),
                                         activeTrackColor:
                                             const Color(0xFF4682B4),
@@ -590,6 +671,8 @@ class _EditPageState extends State<EditPage> {
                                             lastDate: DateTime(2025),
                                           ).then((selectedDate) {
                                             if (selectedDate != null) {
+                                              sentdate =
+                                                  formatISOTime(selectedDate);
                                               dateController.text =
                                                   DateFormat("dd-MM-yyyy")
                                                       .format(selectedDate);
@@ -641,6 +724,8 @@ class _EditPageState extends State<EditPage> {
                                                     lastDate: DateTime(2025),
                                                   ).then((selectedDate) {
                                                     if (selectedDate != null) {
+                                                      sentdate = formatISOTime(
+                                                          selectedDate);
                                                       dateController
                                                           .text = DateFormat(
                                                               "dd-MM-yyyy")
@@ -697,19 +782,19 @@ class _EditPageState extends State<EditPage> {
                                     Flexible(
                                       child: Switch(
                                         onChanged: (asc) {
-                                          if (isSwitched[3] == true) {
+                                          if (hide_date_of_birth == true) {
                                             setState(() {
-                                              isSwitched[3] = false;
+                                              hide_date_of_birth = false;
                                             });
                                             print('Switch Button is OFF');
                                           } else {
                                             setState(() {
-                                              isSwitched[3] = true;
+                                              hide_date_of_birth = true;
                                             });
                                             print('Switch Button is ON');
                                           }
                                         },
-                                        value: isSwitched[3],
+                                        value: hide_date_of_birth,
                                         activeColor: const Color(0xFF4682B4),
                                         activeTrackColor:
                                             const Color(0xFF4682B4),
@@ -884,19 +969,19 @@ class _EditPageState extends State<EditPage> {
                                     Flexible(
                                       child: Switch(
                                         onChanged: (asc) {
-                                          if (isSwitched[4] == true) {
+                                          if (hide_phone == true) {
                                             setState(() {
-                                              isSwitched[4] = false;
+                                              hide_phone = false;
                                             });
                                             print('Switch Button is OFF');
                                           } else {
                                             setState(() {
-                                              isSwitched[4] = true;
+                                              hide_phone = true;
                                             });
                                             print('Switch Button is ON');
                                           }
                                         },
-                                        value: isSwitched[4],
+                                        value: hide_phone,
                                         activeColor: const Color(0xFF4682B4),
                                         activeTrackColor:
                                             const Color(0xFF4682B4),
@@ -1047,6 +1132,8 @@ class _EditPageState extends State<EditPage> {
                                             lastDate: DateTime(2025),
                                           ).then((selectedDate) {
                                             if (selectedDate != null) {
+                                              sentyear =
+                                                  selectedDate.toString();
                                               yearController.text =
                                                   DateFormat("dd-MM-yyyy")
                                                       .format(selectedDate);
@@ -1098,6 +1185,8 @@ class _EditPageState extends State<EditPage> {
                                                     lastDate: DateTime(2025),
                                                   ).then((selectedDate) {
                                                     if (selectedDate != null) {
+                                                      sentyear = selectedDate
+                                                          .toString();
                                                       yearController
                                                           .text = DateFormat(
                                                               "dd-MM-yyyy")
@@ -1154,19 +1243,19 @@ class _EditPageState extends State<EditPage> {
                                     Flexible(
                                       child: Switch(
                                         onChanged: (asc) {
-                                          if (isSwitched[5] == true) {
+                                          if (hide_year_of_diagnosis == true) {
                                             setState(() {
-                                              isSwitched[5] = false;
+                                              hide_year_of_diagnosis = false;
                                             });
                                             print('Switch Button is OFF');
                                           } else {
                                             setState(() {
-                                              isSwitched[5] = true;
+                                              hide_year_of_diagnosis = true;
                                             });
                                             print('Switch Button is ON');
                                           }
                                         },
-                                        value: isSwitched[5],
+                                        value: hide_year_of_diagnosis,
                                         activeColor: const Color(0xFF4682B4),
                                         activeTrackColor:
                                             const Color(0xFF4682B4),
@@ -1275,19 +1364,19 @@ class _EditPageState extends State<EditPage> {
                                     Flexible(
                                       child: Switch(
                                         onChanged: (asc) {
-                                          if (isSwitched[6] == true) {
+                                          if (hide_hospital == true) {
                                             setState(() {
-                                              isSwitched[6] = false;
+                                              hide_hospital = false;
                                             });
                                             print('Switch Button is OFF');
                                           } else {
                                             setState(() {
-                                              isSwitched[6] = true;
+                                              hide_hospital = true;
                                             });
                                             print('Switch Button is ON');
                                           }
                                         },
-                                        value: isSwitched[6],
+                                        value: hide_hospital,
                                         activeColor: const Color(0xFF4682B4),
                                         activeTrackColor:
                                             const Color(0xFF4682B4),
@@ -1339,19 +1428,19 @@ class _EditPageState extends State<EditPage> {
                                     Flexible(
                                       child: Switch(
                                         onChanged: (asc) {
-                                          if (isSwitched[7] == true) {
+                                          if (hide_medications == true) {
                                             setState(() {
-                                              isSwitched[7] = false;
+                                              hide_medications = false;
                                             });
                                             print('Switch Button is OFF');
                                           } else {
                                             setState(() {
-                                              isSwitched[7] = true;
+                                              hide_medications = true;
                                             });
                                             print('Switch Button is ON');
                                           }
                                         },
-                                        value: isSwitched[7],
+                                        value: hide_medications,
                                         activeColor: const Color(0xFF4682B4),
                                         activeTrackColor:
                                             const Color(0xFF4682B4),
@@ -1402,19 +1491,19 @@ class _EditPageState extends State<EditPage> {
                                     Flexible(
                                       child: Switch(
                                         onChanged: (asc) {
-                                          if (isSwitched[8] == true) {
+                                          if (hide_doctor == true) {
                                             setState(() {
-                                              isSwitched[8] = false;
+                                              hide_doctor = false;
                                             });
                                             print('Switch Button is OFF');
                                           } else {
                                             setState(() {
-                                              isSwitched[8] = true;
+                                              hide_doctor = true;
                                             });
                                             print('Switch Button is ON');
                                           }
                                         },
-                                        value: isSwitched[8],
+                                        value: hide_doctor,
                                         activeColor: const Color(0xFF4682B4),
                                         activeTrackColor:
                                             const Color(0xFF4682B4),
@@ -1434,13 +1523,33 @@ class _EditPageState extends State<EditPage> {
                                     context,
                                     nameController.text,
                                     gender,
-                                    dateController.text,
+                                    sentdate,
                                     countrycode,
                                     numb,
-                                    yearController.text,
+                                    sentyear,
                                     hospitalController.text,
                                     medicationController.text,
                                     doctorController.text,
+                                    toBeginningOfSentenceCase(
+                                        hide_email.toString()),
+                                    toBeginningOfSentenceCase(
+                                        hide_gender.toString()),
+                                    toBeginningOfSentenceCase(
+                                        hide_date_of_birth.toString()),
+                                    toBeginningOfSentenceCase(
+                                        hide_phone.toString()),
+                                    toBeginningOfSentenceCase(
+                                        hide_support_group.toString()),
+                                    toBeginningOfSentenceCase(
+                                        hide_condition.toString()),
+                                    toBeginningOfSentenceCase(
+                                        hide_year_of_diagnosis.toString()),
+                                    toBeginningOfSentenceCase(
+                                        hide_hospital.toString()),
+                                    toBeginningOfSentenceCase(
+                                        hide_medications.toString()),
+                                    toBeginningOfSentenceCase(
+                                        hide_doctor.toString()),
                                   );
                                 },
                                 child: Container(

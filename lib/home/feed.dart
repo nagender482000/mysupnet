@@ -5,11 +5,14 @@ import 'dart:convert';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:mysupnet/Apicalls/bookmark.dart';
 import 'package:mysupnet/Apicalls/deletepost.dart';
 import 'package:mysupnet/Apicalls/flag.dart';
 import 'package:mysupnet/Apicalls/likeapi.dart';
+import 'package:mysupnet/Apicalls/unbookmark.dart';
 import 'package:mysupnet/Apicalls/unlikeapi.dart';
 import 'package:mysupnet/drawer.dart';
+import 'package:mysupnet/global.dart';
 import 'package:mysupnet/home/comments.dart';
 import 'package:mysupnet/home/editpostpage.dart';
 import 'package:mysupnet/home/newpost.dart';
@@ -32,6 +35,10 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
   List postdata = [];
   String cval = "drop.png";
   String fval = "drop.png";
+  Widget img = CircleAvatar(
+      backgroundImage: AssetImage(
+    "assets/images/user.png",
+  ));
 
   List<String> clist = ["drop.png", "edit.jpg", "delete.jpg"];
   List<String> flist = ["drop.png", "flag.jpg"];
@@ -69,9 +76,10 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
     http.StreamedResponse response = await request.send();
     var responsed = await http.Response.fromStream(response);
     final responseData = json.decode(responsed.body);
-
+    print(responseData);
     if (response.statusCode == 200) {
       postdata = responseData["data"];
+
       for (int i = 0; i < postdata.length; i++) {
         int likes = postdata[i]["likes"];
         int comments = postdata[i]["comments"].length;
@@ -80,8 +88,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
           "postvis": true,
           "isliked": postdata[i]["current_user_has_liked"],
           "lclickcount": postdata[i]["current_user_has_liked"] ? 1 : 0,
-          "bclickcount": 0,
-          "isbookmarked": false,
+          "bclickcount": postdata[i]["current_user_has_bookmarked"] ? 1 : 0,
+          "isbookmarked": postdata[i]["current_user_has_bookmarked"],
           "isvisible": false,
           "likecount": likes,
           "commentscount": comments,
@@ -89,6 +97,18 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
           "imgvisible": true,
           "user_email": postdata[i]["user_email"].toString()
         };
+        postdata[i]["photo"] != null
+            ? postdatamap[postdata[i]["uuid"].toString()]["photo"] =
+                CircleAvatar(
+                    radius: 25,
+                    backgroundImage:
+                        NetworkImage(baseurl + postdata[i]["photo"].toString()))
+            : postdatamap[postdata[i]["uuid"].toString()]["photo"] =
+                CircleAvatar(
+                    radius: 25,
+                    backgroundImage: AssetImage(
+                      "assets/images/user.png",
+                    ));
         //postdatamap[[postdata[i]["uuid"].toString()].toString()] = {};
       }
     } else {
@@ -106,6 +126,17 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
   }
 
   getpost() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String uimg = prefs.getString('img').toString();
+    print(uimg);
+    uimg != "null"
+        ? img = CircleAvatar(
+            radius: 25, backgroundImage: NetworkImage(baseurl + uimg))
+        : img = CircleAvatar(
+            radius: 25,
+            backgroundImage: AssetImage(
+              "assets/images/user.png",
+            ));
     setState(() {
       isloading = true;
     });
@@ -140,9 +171,17 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
     });
   }
 
-  void bookmark(String id) {
+  void bookmark(String id) async {
+    await bookmarkapi(context, id);
     setState(() {
-      postdatamap[id]["isbookmarked"] = !postdatamap[id]["isbookmarked"];
+      postdatamap[id]["isbookmarked"] = true;
+    });
+  }
+
+  void unbookmark(String id) async {
+    await unbookmarkapi(context, id);
+    setState(() {
+      postdatamap[id]["isbookmarked"] = false;
     });
   }
 
@@ -173,7 +212,9 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const AddNewPost(),
+                            builder: (context) => AddNewPost(
+                              img: img,
+                            ),
                           ));
                         },
                         child: SizedBox(
@@ -183,10 +224,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              CircleAvatar(
-                                radius: 25,
-                                child: Image.asset("assets/images/user.png"),
-                              ),
+                              img,
                               const SizedBox(
                                 width: 20,
                               ),
@@ -203,7 +241,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                   decoration: const InputDecoration(
                                     hintText: " |What's on your mind?",
                                     contentPadding: EdgeInsets.symmetric(
-                                      vertical: 10,
+                                      vertical: 5,
+                                      horizontal: 10,
                                     ),
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
@@ -247,21 +286,22 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                   child: Column(children: [
                                     Stack(children: [
                                       post(
-                                        size,
-                                        psname,
-                                        postdata[index]["text"].toString(),
-                                        postdatamap[id]["commentscount"],
-                                        postdatamap[id]["likecount"],
-                                        index,
-                                        TimeAgo.timeAgoSinceDate(DateTime.parse(
-                                                postdata[index]["created"])
-                                            .toString()),
-                                        postdata[index]["user_condition"]
-                                            .toString(),
-                                        postdata[index]["uuid"].toString(),
-                                        postdata[index]["current_user_post"],
-                                        postdatamap[id]["user_email"],
-                                      ),
+                                          size,
+                                          psname,
+                                          postdata[index]["text"].toString(),
+                                          postdatamap[id]["commentscount"],
+                                          postdatamap[id]["likecount"],
+                                          index,
+                                          TimeAgo.timeAgoSinceDate(
+                                              DateTime.parse(postdata[index]
+                                                      ["created"])
+                                                  .toString()),
+                                          postdata[index]["user_condition"]
+                                              .toString(),
+                                          postdata[index]["uuid"].toString(),
+                                          postdata[index]["current_user_post"],
+                                          postdatamap[id]["user_email"],
+                                          postdatamap[id]["photo"]),
                                     ])
                                   ]));
                             },
@@ -327,8 +367,19 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
     );
   }
 
-  Widget post(Size size, String name, String posttext, int commentscount,
-      int likecount, index, creattime, cond, id, bool current, String email) {
+  Widget post(
+      Size size,
+      String name,
+      String posttext,
+      int commentscount,
+      int likecount,
+      index,
+      creattime,
+      cond,
+      id,
+      bool current,
+      String email,
+      photo) {
     commentdata.add(postdata[index]["comments"]);
 
     return Center(
@@ -357,7 +408,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                     },
                     child: CircleAvatar(
                       radius: 20,
-                      child: Image.asset("assets/images/user.png"),
+                      child: photo,
                     ),
                   ),
                   const SizedBox(
@@ -862,6 +913,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                     onTap: () {
                       if (postdatamap[id]["bclickcount"] % 2 == 0) {
                         bookmark(id);
+                      } else {
+                        unbookmark(id);
                       }
                       postdatamap[id]["bclickcount"] =
                           postdatamap[id]["bclickcount"] + 1;

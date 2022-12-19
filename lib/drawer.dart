@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mysupnet/Apicalls/logout.dart';
+import 'package:mysupnet/global.dart';
 import 'package:mysupnet/profile/profile.dart';
 import 'package:mysupnet/splashscreen/soon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +22,17 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   bool viewVisible = true;
   LinkedHashMap<String, dynamic> userdata = LinkedHashMap();
   String uname = "";
+
+  String uemail = "";
+  Widget img = CircleAvatar(
+      radius: 30,
+      backgroundColor: Colors.transparent,
+      backgroundImage: AssetImage(
+        "assets/images/user.png",
+      ));
+  String uimg = "";
+  String userimg = "";
+
   int likecount = 0;
   int commentscount = 0;
   _sendMail() async {
@@ -35,7 +47,11 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
 
   profile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    uimg = prefs.getString('img').toString();
+
     uname = prefs.getString('name').toString();
+    uemail = prefs.getString('email').toString();
+
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // String token = prefs.getString('token').toString();
 
@@ -78,8 +94,18 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   @override
   Widget build(BuildContext context) {
     String name = uname;
-    const email = "Crohn's 1y";
-    const urlImage = 'assets/images/user.png';
+    String email = uemail;
+    userimg != "null"
+        ? img = CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.transparent,
+            backgroundImage: NetworkImage(baseurl + uimg))
+        : img = CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.transparent,
+            backgroundImage: AssetImage(
+              "assets/images/user.png",
+            ));
     Size size = MediaQuery.of(context).size;
     return Drawer(
       child: SingleChildScrollView(
@@ -96,7 +122,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                     height: size.height * 0.05,
                   ),
                   buildHeader(
-                    urlImage: urlImage,
+                    urlImage: img,
                     name: name,
                     email: email,
                     onClicked: () => Navigator.of(context).push(
@@ -154,7 +180,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   }
 
   Widget buildHeader({
-    String? urlImage,
+    Widget? urlImage,
     String? name,
     String? email,
     VoidCallback? onClicked,
@@ -193,10 +219,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                 ],
               ),
               const SizedBox(width: 20),
-              CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.transparent,
-                  backgroundImage: AssetImage(urlImage!)),
+              Flexible(child: img),
             ],
           ),
         ),
