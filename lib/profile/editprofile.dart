@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl/intl.dart';
 
@@ -48,7 +49,7 @@ class _EditPageState extends State<EditPage> {
   bool hide_hospital = false;
   bool hide_medications = false;
   bool hide_doctor = false;
-  Widget img = CircleAvatar(
+  Widget img = const CircleAvatar(
       radius: 50,
       backgroundImage: AssetImage(
         "assets/images/user.png",
@@ -80,15 +81,6 @@ class _EditPageState extends State<EditPage> {
           "+${duration.inHours.toString().padLeft(2, '0')}${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}");
   }
 
-  // String _disval = "Condition";
-  // List<String> disList = ["Condition"];
-  // List<dynamic> grpList = [];
-  // List<dynamic> grpidList = [];
-  // List<String> grpname = [""];
-  //LinkedHashMap<String, dynamic> templist = LinkedHashMap();
-
-  //String grpval = "";
-  //String grpid = "1";
   @override
   void initState() {
     getuser();
@@ -145,7 +137,7 @@ class _EditPageState extends State<EditPage> {
               radius: 50,
               backgroundImage:
                   NetworkImage(baseurl + userdata["photo"].toString()))
-          : CircleAvatar(
+          : const CircleAvatar(
               radius: 50,
               backgroundImage: AssetImage(
                 "assets/images/user.png",
@@ -347,27 +339,25 @@ class _EditPageState extends State<EditPage> {
                                         showDialog(
                                             context: context,
                                             builder: (context) {
-                                              return Container(
-                                                child: AlertDialog(
-                                                  backgroundColor: Colors.white,
-                                                  content: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: const [
-                                                      CircularProgressIndicator
-                                                          .adaptive(),
-                                                      SizedBox(
-                                                        height: 20,
+                                              return AlertDialog(
+                                                backgroundColor: Colors.white,
+                                                content: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: const [
+                                                    CircularProgressIndicator
+                                                        .adaptive(),
+                                                    SizedBox(
+                                                      height: 20,
+                                                    ),
+                                                    Text(
+                                                      "Uploading...",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 17,
                                                       ),
-                                                      Text(
-                                                        "Uploading...",
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 17,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                    ),
+                                                  ],
                                                 ),
                                               );
                                             });
@@ -1519,38 +1509,46 @@ class _EditPageState extends State<EditPage> {
                               ),
                               InkWell(
                                 onTap: () async {
-                                  await edit(
-                                    context,
-                                    nameController.text,
-                                    gender,
-                                    sentdate,
-                                    countrycode,
-                                    numb,
-                                    sentyear,
-                                    hospitalController.text,
-                                    medicationController.text,
-                                    doctorController.text,
-                                    toBeginningOfSentenceCase(
-                                        hide_email.toString()),
-                                    toBeginningOfSentenceCase(
-                                        hide_gender.toString()),
-                                    toBeginningOfSentenceCase(
-                                        hide_date_of_birth.toString()),
-                                    toBeginningOfSentenceCase(
-                                        hide_phone.toString()),
-                                    toBeginningOfSentenceCase(
-                                        hide_support_group.toString()),
-                                    toBeginningOfSentenceCase(
-                                        hide_condition.toString()),
-                                    toBeginningOfSentenceCase(
-                                        hide_year_of_diagnosis.toString()),
-                                    toBeginningOfSentenceCase(
-                                        hide_hospital.toString()),
-                                    toBeginningOfSentenceCase(
-                                        hide_medications.toString()),
-                                    toBeginningOfSentenceCase(
-                                        hide_doctor.toString()),
-                                  );
+                                  if (date == "") {
+                                    Fluttertoast.showToast(
+                                        msg: "Please Select DOB.");
+                                  } else if (year == "") {
+                                    Fluttertoast.showToast(
+                                        msg: "Please Select Year of Diagnosis");
+                                  } else {
+                                    await edit(
+                                      context,
+                                      nameController.text,
+                                      gender,
+                                      sentdate,
+                                      countrycode,
+                                      numb,
+                                      sentyear,
+                                      hospitalController.text,
+                                      medicationController.text,
+                                      doctorController.text,
+                                      toBeginningOfSentenceCase(
+                                          hide_email.toString()),
+                                      toBeginningOfSentenceCase(
+                                          hide_gender.toString()),
+                                      toBeginningOfSentenceCase(
+                                          hide_date_of_birth.toString()),
+                                      toBeginningOfSentenceCase(
+                                          hide_phone.toString()),
+                                      toBeginningOfSentenceCase(
+                                          hide_support_group.toString()),
+                                      toBeginningOfSentenceCase(
+                                          hide_condition.toString()),
+                                      toBeginningOfSentenceCase(
+                                          hide_year_of_diagnosis.toString()),
+                                      toBeginningOfSentenceCase(
+                                          hide_hospital.toString()),
+                                      toBeginningOfSentenceCase(
+                                          hide_medications.toString()),
+                                      toBeginningOfSentenceCase(
+                                          hide_doctor.toString()),
+                                    );
+                                  }
                                 },
                                 child: Container(
                                   width: MediaQuery.of(context).size.width,

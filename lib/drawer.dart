@@ -24,7 +24,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   String uname = "";
 
   String uemail = "";
-  Widget img = CircleAvatar(
+  Widget img = const CircleAvatar(
       radius: 30,
       backgroundColor: Colors.transparent,
       backgroundImage: AssetImage(
@@ -51,25 +51,6 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
 
     uname = prefs.getString('name').toString();
     uemail = prefs.getString('email').toString();
-
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // String token = prefs.getString('token').toString();
-
-    // var headers = {'Authorization': 'Bearer ' + token.toString()};
-    // var request = http.MultipartRequest(
-    //     'GET', Uri.parse('https://apis.mysupnet.org/api/v1/user'));
-
-    // request.headers.addAll(headers);
-
-    // http.StreamedResponse response = await request.send();
-    // var responsed = await http.Response.fromStream(response);
-    // final responseData = json.decode(responsed.body);
-
-    // if (response.statusCode == 200) {
-    //   userdata = responseData["data"];
-    // } else {
-    //   return responseData["detail"];
-    // }
   }
 
   @override
@@ -99,8 +80,10 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
         ? img = CircleAvatar(
             radius: 30,
             backgroundColor: Colors.transparent,
-            backgroundImage: NetworkImage(baseurl + uimg))
-        : img = CircleAvatar(
+            backgroundImage: NetworkImage(
+              baseurl + uimg,
+            ))
+        : img = const CircleAvatar(
             radius: 30,
             backgroundColor: Colors.transparent,
             backgroundImage: AssetImage(

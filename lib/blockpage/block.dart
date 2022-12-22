@@ -2,9 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:mysupnet/Apicalls/logout.dart';
-import 'package:mysupnet/auth/login.dart';
-import 'package:mysupnet/fadetransition.dart';
-import 'package:mysupnet/home/feed.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BlockPage extends StatefulWidget {
   const BlockPage({Key? key}) : super(key: key);
@@ -15,6 +14,19 @@ class BlockPage extends StatefulWidget {
 
 class _BlockPageState extends State<BlockPage> {
   final searchController = TextEditingController();
+  _sendMail() async {
+    // Android and iOS
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String email = prefs.getString('email').toString();
+    String uri =
+        'mailto:mkpsg@mysupnet.org?subject=Approve Account,&body=Hello, I have signed up with $email and would like to get access to the support group. Please approve my account. \n Thanks';
+    if (await canLaunch(uri)) {
+      await launch(uri);
+    } else {
+      throw 'Could not launch $uri';
+    }
+  }
 
   void onTabTapped(int index) {
     setState(() {});
@@ -31,14 +43,6 @@ class _BlockPageState extends State<BlockPage> {
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      // appBar: PreferredSize(
-      //   preferredSize: const Size.fromHeight(20.0),
-      //   child: AppBar(
-      //     backgroundColor: Colors.white,
-      //     bottomOpacity: 0.0,
-      //     elevation: 0.0,
-      //   ),
-      // ),
       backgroundColor: Colors.white,
       body: Center(
         child: SizedBox(
@@ -101,6 +105,7 @@ class _BlockPageState extends State<BlockPage> {
                               children: [
                                 InkWell(
                                   onTap: () {
+                                    _sendMail();
                                     // Navigator.of(context).pop();
                                     // Navigator.of(context).push(
                                     //     CustomPageRoute(const HomeFeedPage()));
@@ -234,64 +239,20 @@ class Topbar extends StatelessWidget {
       child: Container(
         color: const Color(0xFFF2F9FF),
         child: Container(
-          height: size.height * 0.12,
+          height: size.height * 0.1,
           width: size.width,
           alignment: Alignment.center,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Flexible(
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Color(0xFF4682B4),
+              Padding(
+                padding: const EdgeInsets.only(right: 20.0),
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Image.asset(
+                    "assets/images/53e933ab-b850-43e3-990f-61d635d4ac34.png",
                   ),
-                  onPressed: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                            builder: (context) => const LoginPage()),
-                        (Route<dynamic> route) => false);
-                  },
-                ),
-              ),
-              Flexible(
-                child: TextFormField(
-                  style: const TextStyle(
-                    fontFamily: "Avenir LT Std",
-                    color: Color(0xFF4682B4),
-                    fontSize: 20,
-                  ),
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.only(top: 10),
-                    labelText: "Search",
-                    labelStyle: TextStyle(
-                      fontFamily: "Avenir LT Std",
-                      color: Color(0xFF4682B4),
-                      fontSize: 16,
-                      height: 0.5,
-                    ),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  controller: searchController,
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please Enter a value.';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              GestureDetector(
-                onTap: () {},
-                child: Image.asset(
-                  "assets/images/addec5a8-1f71-4772-96f0-843755aaaed1.png",
-                ),
-              ),
-              GestureDetector(
-                onTap: () {},
-                child: Image.asset(
-                  "assets/images/53e933ab-b850-43e3-990f-61d635d4ac34.png",
                 ),
               ),
             ],

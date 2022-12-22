@@ -18,11 +18,9 @@ log(String email, String password, BuildContext context) async {
   var responsed = await http.Response.fromStream(response);
 
   final responseData = json.decode(responsed.body);
-  print(responseData);
   if (responseData["status"] >= 200 && responseData["status"] <= 400) {
     String message = responseData["detail"];
     // ignore: deprecated_member_use
-    Fluttertoast.showToast(msg: message);
 
     if (message == "success") {
       String token = responseData["data"]["access_token"].toString();
@@ -38,8 +36,11 @@ log(String email, String password, BuildContext context) async {
 
       prefs.setString('name', name);
       prefs.setString('img', img);
+      Fluttertoast.showToast(msg: "Logged in successfully");
 
       splash(token, context);
+    } else {
+      Fluttertoast.showToast(msg: message);
     }
   } else if (responseData["status"] >= 400 && responseData["status"] <= 500) {
     String message = responseData["detail"];

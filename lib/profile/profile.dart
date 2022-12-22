@@ -24,7 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var isLoading = true;
   String dob = "";
   String year = "";
-  Widget img = CircleAvatar(
+  Widget img = const CircleAvatar(
       radius: 50,
       backgroundImage: AssetImage(
         "assets/images/user.png",
@@ -66,15 +66,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     http.StreamedResponse response = await request.send();
     var responsed = await http.Response.fromStream(response);
     final responseData = json.decode(responsed.body);
-    print(responseData);
     if (response.statusCode == 200) {
       userdata = responseData["data"];
+      String userimg = userdata["photo"].toString();
+
+      prefs.setString('img', userimg);
       userdata["photo"] != null
           ? img = CircleAvatar(
               radius: 50,
               backgroundImage:
                   NetworkImage(baseurl + userdata["photo"].toString()))
-          : CircleAvatar(
+          : const CircleAvatar(
               radius: 50,
               backgroundImage: AssetImage(
                 "assets/images/user.png",

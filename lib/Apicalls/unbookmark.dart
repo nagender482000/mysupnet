@@ -17,7 +17,6 @@ unbookmarkapi(
   http.StreamedResponse response = await request.send();
   var responsed = await http.Response.fromStream(response);
   final responseData = json.decode(responsed.body);
-  print(responseData);
   if (response.statusCode == 200) {
     return (responseData["data"]);
   } else {

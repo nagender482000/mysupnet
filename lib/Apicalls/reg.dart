@@ -43,7 +43,10 @@ reg(
   http.StreamedResponse response = await request.send();
   var responsed = await http.Response.fromStream(response);
   final responseData = json.decode(responsed.body);
+
   if (responseData["status"] >= 200 && responseData["status"] <= 400) {
+    String message = responseData["detail"];
+
     token = responseData["data"]["access_token"].toString();
     prefs.setString('token', token);
     prefs.setString('islogged', "true");
@@ -55,26 +58,22 @@ reg(
     prefs.setString('email', email);
     String img = responseData["data"]["user"]["photo"].toString();
     prefs.setString('img', img);
-    String message = responseData["detail"];
-    Fluttertoast.showToast(msg: message);
-    // message,
-    // style: const TextStyle(
-    //   fontFamily: "Avenir LT Std",
-    //   color: Colors.white,
-    //   fontSize: 16,
-    // ),
 
     if (message == "success") {
+      Fluttertoast.showToast(msg: "Account created successfully");
+
       Timer(const Duration(seconds: 3), () {
         Navigator.of(context).pop();
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const BlockPage()));
       });
+    } else {
+      Fluttertoast.showToast(msg: message);
     }
   } else if (responseData["status"] >= 400 && responseData["status"] <= 500) {
     String message = responseData["detail"];
     // ignore: deprecated_member_use
-    Fluttertoast.showToast(msg: message.toString());
+    Fluttertoast.showToast(msg: message);
 
     Navigator.of(context).pop();
   } else {

@@ -9,15 +9,12 @@ profilepic(file) async {
 
   var request = http.MultipartRequest(
       'POST', Uri.parse("https://apis.mysupnet.org/api/v1/user/image"));
-  request.files
-      .add(await http.MultipartFile.fromPath('image', file));
+  request.files.add(await http.MultipartFile.fromPath('image', file));
   request.headers.addAll(headers);
 
   http.StreamedResponse response = await request.send();
   if (response.statusCode == 200) {
     Fluttertoast.showToast(msg: "Uploaded.");
-    print(await response.stream.bytesToString());
   } else {
-    print(response.reasonPhrase);
   }
 }

@@ -17,12 +17,12 @@ class _ForgotOTPBottomSheetState extends State<ForgotOTPBottomSheet> {
   final defaultPinTheme = PinTheme(
     width: 56,
     height: 56,
-    textStyle: TextStyle(
+    textStyle: const TextStyle(
         fontSize: 20,
         color: Color.fromRGBO(30, 60, 87, 1),
         fontWeight: FontWeight.w600),
     decoration: BoxDecoration(
-      border: Border.all(color: Color.fromRGBO(234, 239, 243, 1)),
+      border: Border.all(color: const Color.fromRGBO(234, 239, 243, 1)),
       borderRadius: BorderRadius.circular(20),
     ),
   );
@@ -31,13 +31,13 @@ class _ForgotOTPBottomSheetState extends State<ForgotOTPBottomSheet> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final focusedPinTheme = defaultPinTheme.copyDecorationWith(
-      border: Border.all(color: Color.fromRGBO(114, 178, 238, 1)),
+      border: Border.all(color: const Color.fromRGBO(114, 178, 238, 1)),
       borderRadius: BorderRadius.circular(8),
     );
 
     final submittedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration!.copyWith(
-        color: Color.fromRGBO(234, 239, 243, 1),
+        color: const Color.fromRGBO(234, 239, 243, 1),
       ),
     );
     return Container(
@@ -80,6 +80,7 @@ class _ForgotOTPBottomSheetState extends State<ForgotOTPBottomSheet> {
                   } else {
                     Fluttertoast.showToast(msg: "Enter OTP");
                   }
+                  return null;
                 },
                 pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
                 showCursor: true,

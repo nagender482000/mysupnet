@@ -5,6 +5,7 @@ import 'dart:convert';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:mysupnet/Apicalls/addcomment.dart';
 import 'package:mysupnet/Apicalls/bookmark.dart';
 import 'package:mysupnet/Apicalls/deletepost.dart';
 import 'package:mysupnet/Apicalls/flag.dart';
@@ -35,23 +36,24 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
   List postdata = [];
   String cval = "drop.png";
   String fval = "drop.png";
-  Widget img = CircleAvatar(
+  Widget img = const CircleAvatar(
       backgroundImage: AssetImage(
     "assets/images/user.png",
   ));
+  Map<dynamic, dynamic> postdatamap = {};
 
   List<String> clist = ["drop.png", "edit.jpg", "delete.jpg"];
   List<String> flist = ["drop.png", "flag.jpg"];
 
   List<dynamic> commentdata = [];
   String name = "";
-  Map<dynamic, dynamic> postdatamap = {};
 
   //int bookmarkbuttonclick = 0;
-  void showWidget(String id) {
+  void showWidget(String id) async {
     setState(() {
       postdatamap[id]["isvisible"] = true;
     });
+    await postlist();
   }
 
   void hideWidget(String id) async {
@@ -59,6 +61,29 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
       postdatamap[id]["isvisible"] = false;
     });
     await postlist();
+  }
+
+  Map<dynamic, dynamic> commentdatamap = {};
+  int lcc = 0;
+
+  void clike(String id, i) {
+    likeapi(context, id, "comment");
+
+    setState(() {
+      commentdatamap[id]["isliked"] = true;
+
+      commentdata[0][i]["likes"] = commentdata[0][i]["likes"] + 1;
+    });
+  }
+
+  void cunlike(String id, i) {
+    unlikeapi(context, id);
+
+    setState(() {
+      commentdatamap[id]["isliked"] = false;
+
+      commentdata[0][i]["likes"] = commentdata[0][i]["likes"] - 1;
+    });
   }
 
   postlist() async {
@@ -76,13 +101,12 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
     http.StreamedResponse response = await request.send();
     var responsed = await http.Response.fromStream(response);
     final responseData = json.decode(responsed.body);
-    print(responseData);
     if (response.statusCode == 200) {
       postdata = responseData["data"];
 
       for (int i = 0; i < postdata.length; i++) {
         int likes = postdata[i]["likes"];
-        int comments = postdata[i]["comments"].length;
+        int commentscount = postdata[i]["comments"].length;
 
         postdatamap[postdata[i]["uuid"].toString()] = {
           "postvis": true,
@@ -92,7 +116,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
           "isbookmarked": postdata[i]["current_user_has_bookmarked"],
           "isvisible": false,
           "likecount": likes,
-          "commentscount": comments,
+          "commentscount": commentscount,
           "editvisible": false,
           "imgvisible": true,
           "user_email": postdata[i]["user_email"].toString()
@@ -104,7 +128,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                     backgroundImage:
                         NetworkImage(baseurl + postdata[i]["photo"].toString()))
             : postdatamap[postdata[i]["uuid"].toString()]["photo"] =
-                CircleAvatar(
+                const CircleAvatar(
                     radius: 25,
                     backgroundImage: AssetImage(
                       "assets/images/user.png",
@@ -128,11 +152,10 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
   getpost() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String uimg = prefs.getString('img').toString();
-    print(uimg);
     uimg != "null"
         ? img = CircleAvatar(
             radius: 25, backgroundImage: NetworkImage(baseurl + uimg))
-        : img = CircleAvatar(
+        : img = const CircleAvatar(
             radius: 25,
             backgroundImage: AssetImage(
               "assets/images/user.png",
@@ -521,6 +544,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                       builder: (context) => EditPostPage(
                                             ptext: posttext.toString(),
                                             id: id,
+                                            img: img,
                                           )));
                                 }
                                 if (value == "delete.jpg") {
@@ -552,238 +576,6 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                             ),
                           ),
                         ),
-                  // GestureDetector(
-                  //   onTap: () async {},
-                  //   child: postdatamap[id]["imgvisible"]
-                  //       ? GestureDetector(
-                  //           onTap: () {
-                  //             setState(() {
-                  //               postdatamap[id]["editvisible"] = true;
-                  //               postdatamap[id]["imgvisible"] = false;
-                  //             });
-                  //           },
-                  //           child: Visibility(
-                  //             maintainSize: false,
-                  //             maintainAnimation: true,
-                  //             maintainState: true,
-                  //             visible: postdatamap[id]["imgvisible"],
-                  //             child: SizedBox(
-                  //                 height: size.height * 0.02,
-                  //                 child: Image.asset("assets/images/edit.png",
-                  //                     fit: BoxFit.contain)),
-                  //           ),
-                  //         )
-                  //       : !current
-                  //           ? Visibility(
-                  //               maintainSize: false,
-                  //               maintainAnimation: true,
-                  //               maintainState: true,
-                  //               visible: postdatamap[id]["editvisible"],
-                  //               child: Container(
-                  //                 transformAlignment: Alignment.center,
-                  //                 decoration: BoxDecoration(
-                  //                     border: Border.all(width: 0.2),
-                  //                     borderRadius: BorderRadius.circular(5)),
-                  //                 // height: size.height * 0.08,
-                  //                 width: size.width * .15,
-                  //                 child: Column(
-                  //                   children: [
-                  //                     GestureDetector(
-                  //                       onTap: () async {
-                  //                         await flag(context, id, "post");
-                  //                         setState(() {
-                  //                           postdatamap[id]["editvisible"] =
-                  //                               false;
-                  //                           postdatamap[id]["imgvisible"] =
-                  //                               true;
-                  //                         });
-                  //                       },
-                  //                       child: SizedBox(
-                  //                           height: size.height * 0.02,
-                  //                           child: Row(
-                  //                             children: const [
-                  //                               Icon(
-                  //                                 Icons.flag,
-                  //                                 color: Colors.blue,
-                  //                                 size: 15,
-                  //                               ),
-                  //                               SizedBox(
-                  //                                 width: 5,
-                  //                               ),
-                  //                               Text(
-                  //                                 "Flag",
-                  //                                 style: TextStyle(
-                  //                                     fontSize: 10,
-                  //                                     color: Colors.blue),
-                  //                               ),
-                  //                             ],
-                  //                           )),
-                  //                     ),
-                  //                     const Divider(
-                  //                       thickness: 1,
-                  //                       height: 2,
-                  //                     ),
-                  //                     GestureDetector(
-                  //                       onTap: () {
-                  //                         setState(() {
-                  //                           postdatamap[id]["editvisible"] =
-                  //                               false;
-                  //                           postdatamap[id]["imgvisible"] =
-                  //                               true;
-                  //                         });
-                  //                       },
-                  //                       child: SizedBox(
-                  //                           height: size.height * 0.02,
-                  //                           child: Row(
-                  //                             children: const [
-                  //                               Icon(
-                  //                                 Icons.close,
-                  //                                 color: Colors.red,
-                  //                                 size: 15,
-                  //                               ),
-                  //                               SizedBox(
-                  //                                 width: 5,
-                  //                               ),
-                  //                               Text(
-                  //                                 "Close",
-                  //                                 style: TextStyle(
-                  //                                     fontSize: 10,
-                  //                                     color: Colors.red),
-                  //                               ),
-                  //                             ],
-                  //                           )),
-                  //                     ),
-                  //                   ],
-                  //                 ),
-                  //               ),
-                  //             )
-                  //           : Visibility(
-                  //               maintainSize: false,
-                  //               maintainAnimation: true,
-                  //               maintainState: true,
-                  //               visible: postdatamap[id]["editvisible"],
-                  //               child: Container(
-                  //                 transformAlignment: Alignment.center,
-                  //                 decoration: BoxDecoration(
-                  //                     border: Border.all(width: 0.2),
-                  //                     borderRadius: BorderRadius.circular(5)),
-                  //                 // height: size.height * 0.08,
-                  //                 width: size.width * .15,
-                  //                 child: Column(
-                  //                   children: [
-                  //                     GestureDetector(
-                  //                       onTap: () {
-                  //                         Navigator.of(context).push(
-                  //                             MaterialPageRoute(
-                  //                                 builder: (context) =>
-                  //                                     EditPostPage(
-                  //                                       ptext:
-                  //                                           posttext.toString(),
-                  //                                       id: id,
-                  //                                     )));
-                  //                         setState(() {
-                  //                           postdatamap[id]["editvisible"] =
-                  //                               false;
-                  //                           postdatamap[id]["imgvisible"] =
-                  //                               true;
-                  //                         });
-                  //                       },
-                  //                       child: SizedBox(
-                  //                           height: size.height * 0.02,
-                  //                           child: Row(
-                  //                             children: const [
-                  //                               Icon(
-                  //                                 Icons.edit,
-                  //                                 color: Colors.blue,
-                  //                                 size: 15,
-                  //                               ),
-                  //                               SizedBox(
-                  //                                 width: 5,
-                  //                               ),
-                  //                               Text(
-                  //                                 "Edit",
-                  //                                 style: TextStyle(
-                  //                                     fontSize: 10,
-                  //                                     color: Colors.blue),
-                  //                               ),
-                  //                             ],
-                  //                           )),
-                  //                     ),
-                  //                     const Divider(
-                  //                       thickness: 1,
-                  //                       height: 2,
-                  //                     ),
-                  //                     GestureDetector(
-                  //                       onTap: () async {
-                  //                         await delpost(context, id);
-                  //                         setState(() {
-                  //                           postdatamap[id]["postvis"] = false;
-                  //                           postdatamap[id]["editvisible"] =
-                  //                               false;
-                  //                           postdatamap[id]["imgvisible"] =
-                  //                               true;
-                  //                         });
-                  //                       },
-                  //                       child: SizedBox(
-                  //                           height: size.height * 0.02,
-                  //                           child: Row(
-                  //                             children: const [
-                  //                               Icon(
-                  //                                 Icons.delete,
-                  //                                 color: Colors.blue,
-                  //                                 size: 15,
-                  //                               ),
-                  //                               SizedBox(
-                  //                                 width: 5,
-                  //                               ),
-                  //                               Text(
-                  //                                 "Delete",
-                  //                                 style: TextStyle(
-                  //                                     fontSize: 10,
-                  //                                     color: Colors.blue),
-                  //                               ),
-                  //                             ],
-                  //                           )),
-                  //                     ),
-                  //                     const Divider(
-                  //                       thickness: 1,
-                  //                       height: 2,
-                  //                     ),
-                  //                     GestureDetector(
-                  //                       onTap: () {
-                  //                         setState(() {
-                  //                           postdatamap[id]["editvisible"] =
-                  //                               false;
-                  //                           postdatamap[id]["imgvisible"] =
-                  //                               true;
-                  //                         });
-                  //                       },
-                  //                       child: SizedBox(
-                  //                           height: size.height * 0.02,
-                  //                           child: Row(
-                  //                             children: const [
-                  //                               Icon(
-                  //                                 Icons.close,
-                  //                                 color: Colors.red,
-                  //                                 size: 15,
-                  //                               ),
-                  //                               SizedBox(
-                  //                                 width: 5,
-                  //                               ),
-                  //                               Text(
-                  //                                 "Close",
-                  //                                 style: TextStyle(
-                  //                                     fontSize: 10,
-                  //                                     color: Colors.red),
-                  //                               ),
-                  //                             ],
-                  //                           )),
-                  //                     ),
-                  //                   ],
-                  //                 ),
-                  //               ),
-                  //             ),
-                  // ),
                   const SizedBox(
                     width: 20,
                   ),
@@ -935,8 +727,149 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                 visible: postdatamap[id]["isvisible"],
                 child: Column(
                   children: [
-                    CommentsSec(id, index, postdata, postdatamap, commentdata,
-                        postdatamap[id]["postvis"]),
+                    Column(
+                      children: [
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const ScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: postdata[index]["comments"].length,
+                          itemBuilder: (context, i) {
+                            Widget img = const CircleAvatar(
+                                backgroundImage: AssetImage(
+                              "assets/images/user.png",
+                            ));
+
+                            setupimg() async {
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              String uimg = prefs.getString('img').toString();
+                              uimg != "null"
+                                  ? img = CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage:
+                                          NetworkImage(baseurl + uimg))
+                                  : img = const CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage: AssetImage(
+                                        "assets/images/user.png",
+                                      ));
+                            }
+
+                            String name = "";
+                            bool isloading = true;
+                            for (int i = 0; i < commentdata[0].length; i++) {
+                              if (commentdata[0][i]["current_user_has_liked"]) {
+                                lcc = 1;
+                              } else {
+                                lcc = 0;
+                              }
+                              commentdatamap[commentdata[0][i]["uuid"]] = {
+                                "isliked": commentdata[0][i]
+                                    ["current_user_has_liked"],
+                                "lclickcount": lcc,
+                              };
+                            }
+                            commentdata.clear();
+                            commentdata.add(postdata[index]["comments"]);
+
+                            if (postdata[index]["comments"].length > 0) {
+                              return Column(children: [
+                                comments(
+                                  size,
+                                  commentdata[0][i]["uuid"].toString(),
+                                  commentdata[0][i]["user_name"].toString(),
+                                  commentdata[0][i]["text"].toString(),
+                                  postdatamap[id]["isvisible"],
+                                  commentdata[0][i]["likes"],
+                                  TimeAgo.timeAgoSinceDate(DateTime.parse(
+                                          commentdata[0][i]["created"])
+                                      .toString()),
+                                  i,
+                                  commentdata[0][i]["user_photo"].toString(),
+                                ),
+                              ]);
+                            }
+                            return SizedBox(
+                              width: size.width,
+                              height: size.height * 0.1,
+                              child: const Text(
+                                "There are no Comments to show. ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: "Avenir LT Std",
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(
+                          width: size.width,
+                          height: size.height * 0.1,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                radius: 25,
+                                child: img,
+                              ),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Container(
+                                width: size.width * 0.6,
+                                alignment: Alignment.center,
+                                child: TextFormField(
+                                  style: const TextStyle(
+                                      fontFamily: "Avenir LT Std",
+                                      color: Color(0xFF000000),
+                                      fontSize: 14),
+                                  decoration: const InputDecoration(
+                                    isDense: false,
+                                    hintText: " Write a comment",
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 20,
+                                    ),
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20.0))),
+                                  ),
+                                  autofocus: false,
+                                  controller: commentController,
+                                ),
+                              ),
+                              isloading
+                                  ? const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    )
+                                  : IconButton(
+                                      onPressed: () async {
+                                        setState(() {
+                                          isloading = true;
+                                        });
+                                        await addcomment(context, id,
+                                            commentController.text);
+                                        commentController.text = "";
+                                        setState(() {
+                                          isloading = false;
+                                        });
+                                      },
+                                      icon: const Icon(Icons.send),
+                                    ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -945,6 +878,135 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
         ),
       ),
     );
+  }
+
+  Column comments(Size size, String cid, String commentname, String commenttext,
+      bool viewVisible, likes, hrs, i, photo) {
+    Widget userpic = const CircleAvatar(
+        radius: 25,
+        backgroundImage: NetworkImage(
+          "assets/images/user.png",
+        ));
+    photo != "null"
+        ? userpic = CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(
+                baseurl + commentdata[0][i]["user_photo"].toString()))
+        : userpic = const CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(
+              "assets/images/user.png",
+            ));
+    return Column(children: [
+      SizedBox(
+          child: SizedBox(
+              width: size.width,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        userpic,
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              commentname,
+                              style: const TextStyle(
+                                fontFamily: "Avenir LT Std",
+                                color: Color(0xFF4078A6),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20.0),
+                              child: Container(
+                                width: size.width * 0.75,
+                                color: const Color(0xFFF6F6F6),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    commenttext,
+                                    style: const TextStyle(
+                                      fontFamily: "Avenir LT Std",
+                                      color: Colors.black,
+                                      fontSize: 13,
+                                      //fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            SizedBox(
+                              height: size.height * 0.02,
+                              width: size.width * 0.3,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    hrs,
+                                    style: const TextStyle(
+                                      fontFamily: "Avenir LT Std",
+                                      color: Colors.black,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (commentdatamap[cid]["lclickcount"] %
+                                              2 ==
+                                          0) {
+                                        clike(cid, i);
+                                      }
+                                      setState(() {
+                                        commentdatamap[cid]["lclickcount"] =
+                                            commentdatamap[cid]["lclickcount"] +
+                                                1;
+                                      });
+                                    },
+                                    child: Text(
+                                      likes.toString() + " likes",
+                                      style: const TextStyle(
+                                        fontFamily: "Avenir LT Std",
+                                        color: Colors.black,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                  ],
+                ),
+              )))
+    ]);
   }
 }
 
