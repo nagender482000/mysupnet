@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 unlikeapi(
-  context,
   String id,
 ) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -14,9 +13,7 @@ unlikeapi(
       'DELETE', Uri.parse("https://apis.mysupnet.org/api/v1/like/" + id));
   request.headers.addAll(headers);
 
-  // request.fields.addAll({
-  //   'object_uuid': id,
-  // });
+
 
   http.StreamedResponse response = await request.send();
   var responsed = await http.Response.fromStream(response);

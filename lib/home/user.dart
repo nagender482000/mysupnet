@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mysupnet/drawer.dart';
 import 'package:mysupnet/global.dart';
-import 'package:mysupnet/home/feed.dart';
+import 'package:mysupnet/home/feed/HomeFeed.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
