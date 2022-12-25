@@ -10,7 +10,6 @@ import 'package:mysupnet/Apicalls/flag.dart';
 
 import 'package:mysupnet/drawer.dart';
 import 'package:mysupnet/global.dart';
-import 'package:mysupnet/home/editpostpage.dart';
 import 'package:mysupnet/home/feed/FeedProvider.dart';
 import 'package:mysupnet/home/newpost.dart';
 import 'package:mysupnet/home/user.dart';
@@ -96,6 +95,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => AddNewPost(
+                                        isEditPost: false,
                                         img: CachedNetworkImage(
                                           imageUrl: baseurl + uimg.toString(),
                                           imageBuilder:
@@ -440,8 +440,11 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                             return DropdownMenuItem(
                               alignment: Alignment.centerRight,
                               value: value,
-                              child: Image.asset("assets/images/" + value,
-                                  height: 20, fit: BoxFit.contain),
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 20.0),
+                                child: Image.asset("assets/images/" + value,
+                                    height: 20, fit: BoxFit.contain),
+                              ),
                             );
                           }).toList(),
                         ),
@@ -460,7 +463,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                           onChanged: (value) async {
                             if (value == "edit.jpg") {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => EditPostPage(
+                                  builder: (context) => AddNewPost(
+                                        isEditPost: true,
                                         email: feedModel
                                             .feed!.data[postindex].userEmail,
                                         name: feedModel
@@ -514,18 +518,18 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                             return DropdownMenuItem(
                               alignment: Alignment.centerRight,
                               value: value,
-                              child: Image.asset(
-                                "assets/images/" + value,
-                                height: 20,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 20.0),
+                                child: Image.asset(
+                                  "assets/images/" + value,
+                                  height: 20,
+                                ),
                               ),
                             );
                           }).toList(),
                         ),
                       ),
                     ),
-              const SizedBox(
-                width: 20,
-              ),
             ],
           ),
           const SizedBox(
@@ -897,7 +901,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                   child: Text(
                                     "  " +
                                         feedModel.feed!.data[postindex]
-                                            .comments[commentindex].text,
+                                            .comments[commentindex].text
+                                            .toString(),
                                     style: const TextStyle(
                                       fontFamily: "Avenir LT Std",
                                       color: Colors.black,
@@ -929,25 +934,22 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      if (!feedModel.feed!.data[postindex]
-                                          .currentUserPost) {
-                                        if (!feedModel
-                                            .feed!
-                                            .data[postindex]
-                                            .comments[commentindex]
-                                            .currentUserHasLiked) {
-                                          feedModel.commnetLike(
-                                              feedModel
-                                                  .feed!.data[postindex].uuid,
-                                              postindex,
-                                              commentindex);
-                                        } else {
-                                          feedModel.commentUnlike(
-                                              feedModel
-                                                  .feed!.data[postindex].uuid,
-                                              postindex,
-                                              commentindex);
-                                        }
+                                      if (!feedModel
+                                          .feed!
+                                          .data[postindex]
+                                          .comments[commentindex]
+                                          .currentUserHasLiked) {
+                                        feedModel.commnetLike(
+                                            feedModel
+                                                .feed!.data[postindex].uuid,
+                                            postindex,
+                                            commentindex);
+                                      } else {
+                                        feedModel.commentUnlike(
+                                            feedModel
+                                                .feed!.data[postindex].uuid,
+                                            postindex,
+                                            commentindex);
                                       }
                                     },
                                     child: Text(
