@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mysupnet/Apicalls/logout.dart';
@@ -24,12 +25,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   String uname = "";
 
   String uemail = "";
-  Widget img = const CircleAvatar(
-      radius: 30,
-      backgroundColor: Colors.transparent,
-      backgroundImage: AssetImage(
-        "assets/images/user.png",
-      ));
+
   String uimg = "";
   String userimg = "";
 
@@ -76,19 +72,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   Widget build(BuildContext context) {
     String name = uname;
     String email = uemail;
-    userimg != "null"
-        ? img = CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.transparent,
-            backgroundImage: NetworkImage(
-              baseurl + uimg,
-            ))
-        : img = const CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.transparent,
-            backgroundImage: AssetImage(
-              "assets/images/user.png",
-            ));
+
     Size size = MediaQuery.of(context).size;
     return Drawer(
       child: SingleChildScrollView(
@@ -105,7 +89,6 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                     height: size.height * 0.05,
                   ),
                   buildHeader(
-                    urlImage: img,
                     name: name,
                     email: email,
                     onClicked: () => Navigator.of(context).push(
@@ -163,7 +146,6 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   }
 
   Widget buildHeader({
-    Widget? urlImage,
     String? name,
     String? email,
     VoidCallback? onClicked,
@@ -202,7 +184,36 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                 ],
               ),
               const SizedBox(width: 20),
-              Flexible(child: img),
+              Flexible(
+                  child: CachedNetworkImage(
+                imageUrl: baseurl + uimg.toString(),
+                imageBuilder: (context, imageProvider) => Container(
+                  width: 80.0,
+                  height: 80.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                        image: imageProvider, fit: BoxFit.cover),
+                  ),
+                ),
+                placeholder: (context, url) => const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => const CircleAvatar(
+                  radius: 31,
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: AssetImage(
+                        "assets/images/user.png",
+                      )),
+                ),
+              )),
             ],
           ),
         ),
@@ -249,9 +260,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
         break;
       case 2:
         _sendMail();
-        // Navigator.of(context).pushReplacement(MaterialPageRoute(
-        //   builder: (context) => const ProfileScreen(),
-        // ));
+
         break;
       case 3:
         Navigator.of(context).push(MaterialPageRoute(

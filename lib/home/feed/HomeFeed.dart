@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:cached_network_image/cached_network_image.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -29,10 +30,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
   bool iscommenting = true;
   String cval = "drop.png";
   String fval = "drop.png";
-  Widget img = const CircleAvatar(
-      backgroundImage: AssetImage(
-    "assets/images/user.png",
-  ));
+
   List<String> clist = ["drop.png", "edit.jpg", "delete.jpg"];
   List<String> flist = ["drop.png", "flag.jpg"];
   String name = "";
@@ -53,15 +51,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
     name = prefs.getString('name').toString();
 
     email = prefs.getString('email').toString();
-    print(uimg);
-    uimg != "null"
-        ? img = CircleAvatar(
-            radius: 25, backgroundImage: NetworkImage(baseurl + uimg))
-        : img = const CircleAvatar(
-            radius: 25,
-            backgroundImage: AssetImage(
-              "assets/images/user.png",
-            ));
+    print(baseurl + uimg.toString());
+
     final feedModel = Provider.of<FeedProvider>(context, listen: false);
 
     feedModel.getpost();
@@ -105,8 +96,38 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => AddNewPost(
-                                      img: img,
-                                    ),
+                                        img: CachedNetworkImage(
+                                          imageUrl: baseurl + uimg.toString(),
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  Container(
+                                            width: 50.0,
+                                            height: 50.0,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                  image: imageProvider,
+                                                  fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) =>
+                                              const Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.blue,
+                                              ),
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const CircleAvatar(
+                                                  radius: 25,
+                                                  backgroundImage: AssetImage(
+                                                    "assets/images/user.png",
+                                                  )),
+                                        ),
+                                        name: name,
+                                        email: email),
                                   ));
                                 },
                                 child: SizedBox(
@@ -117,7 +138,36 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                         CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      img,
+                                      CachedNetworkImage(
+                                        imageUrl: baseurl + uimg.toString(),
+                                        imageBuilder:
+                                            (context, imageProvider) =>
+                                                Container(
+                                          width: 50.0,
+                                          height: 50.0,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.cover),
+                                          ),
+                                        ),
+                                        placeholder: (context, url) =>
+                                            const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            const CircleAvatar(
+                                                radius: 25,
+                                                backgroundImage: AssetImage(
+                                                  "assets/images/user.png",
+                                                )),
+                                      ),
                                       const SizedBox(
                                         width: 10,
                                       ),
@@ -261,20 +311,6 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
 
   Widget post(Size size, postindex, creattime, FeedProvider feedModel, name,
       email, uimg) {
-    Widget pic = CircleAvatar(
-        radius: 25,
-        backgroundImage: NetworkImage(
-            baseurl + feedModel.feed!.data[postindex].photo.toString()));
-    feedModel.feed!.data[postindex].photo != "null"
-        ? pic = CircleAvatar(
-            radius: 25,
-            backgroundImage: NetworkImage(
-                baseurl + feedModel.feed!.data[postindex].photo.toString()))
-        : pic = const CircleAvatar(
-            radius: 25,
-            backgroundImage: AssetImage(
-              "assets/images/user.png",
-            ));
     return Center(
         child: SizedBox(
       width: size.width * 0.95,
@@ -296,9 +332,33 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                             email: feedModel.feed!.data[postindex].userEmail,
                           )));
                 },
-                child: CircleAvatar(
-                  radius: 20,
-                  child: pic,
+                child: CachedNetworkImage(
+                  imageUrl: baseurl +
+                      feedModel.feed!.data[postindex].photo
+                          .toString()
+                          .toString(),
+                  imageBuilder: (context, imageProvider) => Container(
+                    width: 50.0,
+                    height: 50.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: imageProvider, fit: BoxFit.cover),
+                    ),
+                  ),
+                  placeholder: (context, url) => const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => const CircleAvatar(
+                      radius: 25,
+                      backgroundImage: AssetImage(
+                        "assets/images/user.png",
+                      )),
                 ),
               ),
               const SizedBox(
@@ -329,7 +389,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                   Row(
                     children: [
                       Text(
-                        feedModel.feed!.data[postindex].userCondition,
+                        feedModel.feed!.data[postindex].userCondition
+                            .toString(),
                         style: const TextStyle(
                           fontFamily: "Avenir LT Std",
                           color: Colors.black,
@@ -400,12 +461,45 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                             if (value == "edit.jpg") {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => EditPostPage(
+                                        email: feedModel
+                                            .feed!.data[postindex].userEmail,
+                                        name: feedModel
+                                            .feed!.data[postindex].userName,
                                         ptext: feedModel
                                             .feed!.data[postindex].text
                                             .toString(),
                                         id: feedModel
                                             .feed!.data[postindex].uuid,
-                                        img: img,
+                                        img: CachedNetworkImage(
+                                          imageUrl: baseurl + uimg.toString(),
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  Container(
+                                            width: 50.0,
+                                            height: 50.0,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                  image: imageProvider,
+                                                  fit: BoxFit.cover),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) =>
+                                              const Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.blue,
+                                              ),
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const CircleAvatar(
+                                                  radius: 25,
+                                                  backgroundImage: AssetImage(
+                                                    "assets/images/user.png",
+                                                  )),
+                                        ),
                                       )));
                             }
                             if (value == "delete.jpg") {
@@ -632,7 +726,33 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                         children: [
                           CircleAvatar(
                             radius: 25,
-                            child: img,
+                            child: CachedNetworkImage(
+                              imageUrl: baseurl + uimg.toString(),
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                width: 50.0,
+                                height: 50.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      image: imageProvider, fit: BoxFit.cover),
+                                ),
+                              ),
+                              placeholder: (context, url) => const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage: AssetImage(
+                                        "assets/images/user.png",
+                                      )),
+                            ),
                           ),
                           const SizedBox(
                             width: 20,
@@ -702,22 +822,6 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
 
   Column comments(
       Size size, hrs, postindex, commentindex, FeedProvider feedModel) {
-    Widget userpic = const CircleAvatar(
-        radius: 25,
-        backgroundImage: NetworkImage(
-          "assets/images/user.png",
-        ));
-    feedModel.feed!.data[postindex].comments[commentindex].userPhoto != "null"
-        ? userpic = CircleAvatar(
-            radius: 25,
-            backgroundImage: NetworkImage(baseurl +
-                feedModel.feed!.data[postindex].comments[commentindex].userPhoto
-                    .toString()))
-        : userpic = const CircleAvatar(
-            radius: 25,
-            backgroundImage: NetworkImage(
-              "assets/images/user.png",
-            ));
     return Column(children: [
       SizedBox(
           child: SizedBox(
@@ -734,7 +838,35 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        userpic,
+                        CachedNetworkImage(
+                          imageUrl: baseurl +
+                              feedModel.feed!.data[postindex]
+                                  .comments[commentindex].userPhoto
+                                  .toString(),
+                          imageBuilder: (context, imageProvider) => Container(
+                            width: 50.0,
+                            height: 50.0,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: imageProvider, fit: BoxFit.cover),
+                            ),
+                          ),
+                          placeholder: (context, url) => const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              const CircleAvatar(
+                                  radius: 25,
+                                  backgroundImage: AssetImage(
+                                    "assets/images/user.png",
+                                  )),
+                        ),
                         const SizedBox(
                           width: 20,
                         ),

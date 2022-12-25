@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:mysupnet/auth/login.dart';
 import 'package:mysupnet/home/feed/FeedProvider.dart';
 import 'package:mysupnet/home/feed/HomeFeed.dart';
+import 'package:mysupnet/profile/editprofile.dart';
 import 'package:mysupnet/splashscreen/splashscreen.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';

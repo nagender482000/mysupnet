@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -23,11 +24,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   var isLoading = true;
   String dob = "";
   String year = "";
-  Widget img = const CircleAvatar(
-      radius: 50,
-      backgroundImage: AssetImage(
-        "assets/images/user.png",
-      ));
+
   void onTabTapped(int index) {
     setState(() {});
   }
@@ -67,16 +64,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final responseData = json.decode(responsed.body);
     if (response.statusCode == 200) {
       userdata = responseData["data"];
-      userdata["photo"] != null
-          ? img = CircleAvatar(
-              radius: 50,
-              backgroundImage:
-                  NetworkImage(baseurl + userdata["photo"].toString()))
-          : const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(
-                "assets/images/user.png",
-              ));
     } else {
       return responseData["detail"];
     }
@@ -124,7 +111,36 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           children: [
                             Row(
                               children: [
-                                Flexible(child: img),
+                                Flexible(
+                                    child: CachedNetworkImage(
+                                  imageUrl:
+                                      baseurl + userdata["photo"].toString(),
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    width: 80.0,
+                                    height: 80.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover),
+                                    ),
+                                  ),
+                                  placeholder: (context, url) => const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const CircleAvatar(
+                                          radius: 50,
+                                          backgroundImage: AssetImage(
+                                            "assets/images/user.png",
+                                          )),
+                                )),
                                 const SizedBox(
                                   width: 10,
                                 ),

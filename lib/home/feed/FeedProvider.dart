@@ -102,13 +102,14 @@ class FeedProvider extends ChangeNotifier {
         likes: 0));
     commentController.text = "";
     feed!.data[postindex].commentCount += 1;
+     iscommenting = false;
+
+    notifyListeners();
     await addcomment(
       context,
       feed!.data[postindex].uuid,
       commentController.text,
     );
-    iscommenting = false;
-
-    notifyListeners();
+   
   }
 }

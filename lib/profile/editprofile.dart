@@ -3,6 +3,7 @@
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -132,16 +133,30 @@ class _EditPageState extends State<EditPage> {
       hide_medications = userdata["hide_medications"];
       hide_doctor = userdata["hide_doctor"];
       gender = userdata["gender"].toString();
-      userdata["photo"] != null
-          ? img = CircleAvatar(
-              radius: 50,
-              backgroundImage:
-                  NetworkImage(baseurl + userdata["photo"].toString()))
-          : const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(
-                "assets/images/user.png",
-              ));
+      img = CachedNetworkImage(
+        imageUrl: baseurl + userdata["photo"].toString(),
+        imageBuilder: (context, imageProvider) => Container(
+          width: 80.0,
+          height: 80.0,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+          ),
+        ),
+        placeholder: (context, url) => const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+        errorWidget: (context, url, error) => const CircleAvatar(
+            radius: 50,
+            backgroundImage: AssetImage(
+              "assets/images/user.png",
+            )),
+      );
       if (gender == "Male") {
         _gradioSelected = 1;
       } else {
@@ -188,111 +203,9 @@ class _EditPageState extends State<EditPage> {
     super.dispose();
   }
 
-  // getConditionData() async {
-  //   var request = http.MultipartRequest(
-  //       'GET',
-  //       Uri.parse(
-  //           'https://apis.mysupnet.org/api/v1/supportgroup/disease/list'));
-  //   http.StreamedResponse response = await request.send();
-  //   var responsed = await http.Response.fromStream(response);
-  //   final item = json.decode(responsed.body);
-  //   setState(() {
-  //     isLoading = true;
-
-  //     disList.remove("Condition");
-  //     item.forEach((key, value1) {
-  //       disList.add(key);
-  //       _disval = disList[0];
-  //     });
-  //   });
-
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  // }
-
-  // getGroupData(int index) async {
-  //   var request = http.MultipartRequest(
-  //       'GET',
-  //       Uri.parse(
-  //           'https://apis.mysupnet.org/api/v1/supportgroup/disease/list'));
-  //   http.StreamedResponse response = await request.send();
-  //   var responsed = await http.Response.fromStream(response);
-  //   final item = json.decode(responsed.body);
-
-  //   int i = 0;
-
-  //   setState(() {
-  //     isLoading = true;
-  //     item.forEach((key, value1) {
-  //       templist.addAll(value1);
-  //       templist.forEach((key, value2) {
-  //         if (i % 2 == 1) {
-  //           grpList.add(value2);
-  //         }
-  //         i++;
-  //       });
-  //     });
-
-  //     i = 0;
-  //     for (var element in grpList) {
-  //       if (i == index) {
-  //         grpidList.addAll(element);
-  //       }
-  //       i++;
-  //     }
-  //     grpname.clear();
-  //     for (i = 0; i < grpidList.length; i++) {
-  //       grpname.add(grpidList[i]["name"]);
-  //     }
-  //     grpval = grpname[0];
-
-  //     grpList.clear();
-  //     grpidList.clear();
-  //   });
-
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  // }
-
-  // void grpnameset(String disval) {
-  //   int index = 0;
-  //   for (int i = 0; i < disList.length; i++) {
-  //     if (disList[i] == disval) {
-  //       index = i;
-  //       break;
-  //     }
-  //   }
-  //   getGroupData(index);
-  // }
-
-  // void grpidsearch(
-  //   String searchval,
-  //   grpList,
-  // ) {
-  //   for (int i = 0; i < grpList.length; i++) {
-  //     for (int j = 0; j < grpList[i].length; j++) {
-  //       if (grpList[i][j]["name"] == searchval) {
-  //         grpid = grpList[i][j]["id"].toString();
-  //         break;
-  //       }
-  //     }
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    // dateController.text = userdata["date_of_birth"].toString();
-    // yearController.text = userdata["year_of_diagnosis"].toString();
-    // countrycode = userdata["country_code"].toString();
-    // medicationController.text = userdata["medications"].toString();
-    // doctorController.text = userdata["physician"].toString();
-    // emailController.text = userdata["email"].toString();
-    // nameController.text = userdata["name"].toString();
-    // gender = userdata["gender"].toString();
-    // number = userdata["phone"].toString();
 
     if (gender == "Male") {
       _gradioSelected = 1;
@@ -454,19 +367,7 @@ class _EditPageState extends State<EditPage> {
                                             ),
                                           ),
                                           Switch(
-                                            onChanged: (asd) {
-                                              // if (hide_name == true) {
-                                              //   setState(() {
-                                              //     isSwitched[0] = false;
-                                              //   });
-                                              //   print('Switch Button is OFF');
-                                              // } else {
-                                              //   setState(() {
-                                              //     isSwitched[0] = true;
-                                              //   });
-                                              //   print('Switch Button is ON');
-                                              // }
-                                            },
+                                            onChanged: (asd) {},
                                             value: true,
                                             activeColor:
                                                 const Color(0xFF4682B4),
@@ -795,115 +696,6 @@ class _EditPageState extends State<EditPage> {
                                   ],
                                 ),
                               ),
-                              // const SizedBox(
-                              //   height: 16,
-                              // ),
-                              // Container(
-                              //   alignment: Alignment.center,
-                              //   child: Row(
-                              //     children: [
-                              //       Flexible(
-                              //         child: TextFormField(
-                              //           style: const TextStyle(
-                              //             fontFamily: "Avenir LT Std",
-                              //             color: Color(0xFF000000),
-                              //             fontSize: 20,
-                              //           ),
-                              //           decoration: const InputDecoration(
-                              //             labelText: "Country of Residence",
-                              //             labelStyle: TextStyle(
-                              //               fontFamily: "Avenir LT Std",
-                              //               color: Color(0xFFB8B8B8),
-                              //               fontSize: 16,
-                              //             ),
-                              //           ),
-                              //           keyboardType: TextInputType.name,
-                              //           controller: countryController,
-                              //           validator: (value) {
-                              //             if (value == null || value.isEmpty) {
-                              //               return 'Please Enter Country';
-                              //             }
-                              //             return null;
-                              //           },
-                              //         ),
-                              //       ),
-                              //       const SizedBox(
-                              //         width: 50,
-                              //       ),
-                              //       Flexible(
-                              //         child: InkWell(
-                              //           onTap: () async {
-                              //             showCountryPicker(
-                              //               context: context,
-                              //               //Optional.  Can be used to exclude(remove) one ore more country from the countries list (optional).
-                              //               exclude: <String>['KN', 'MF'],
-                              //               //Optional. Shows phone code before the country name.
-                              //               showPhoneCode: true,
-                              //               onSelect: (Country country) {
-                              //                 countryController.text = country
-                              //                     .displayNameNoCountryCode
-                              //                     .toString();
-                              //               },
-                              //               // Optional. Sets the theme for the country list picker.
-                              //               countryListTheme:
-                              //                   CountryListThemeData(
-                              //                 // Optional. Sets the border radius for the bottomsheet.
-                              //                 borderRadius:
-                              //                     const BorderRadius.only(
-                              //                   topLeft: Radius.circular(40.0),
-                              //                   topRight: Radius.circular(40.0),
-                              //                 ),
-                              //                 // Optional. Styles the search field.
-                              //                 inputDecoration: InputDecoration(
-                              //                   labelText: 'Search',
-                              //                   hintText:
-                              //                       'Start typing to search',
-                              //                   prefixIcon:
-                              //                       const Icon(Icons.search),
-                              //                   border: OutlineInputBorder(
-                              //                     borderSide: BorderSide(
-                              //                       color: const Color(0xFF8C98A8)
-                              //                           .withOpacity(0.2),
-                              //                     ),
-                              //                   ),
-                              //                 ),
-                              //               ),
-                              //             );
-                              //           },
-                              //           child: Container(
-                              //             width:
-                              //                 MediaQuery.of(context).size.width,
-                              //             padding: const EdgeInsets.symmetric(
-                              //                 vertical: 13),
-                              //             alignment: Alignment.center,
-                              //             decoration: BoxDecoration(
-                              //                 borderRadius:
-                              //                     const BorderRadius.all(
-                              //                         Radius.circular(4)),
-                              //                 boxShadow: <BoxShadow>[
-                              //                   BoxShadow(
-                              //                       color: const Color(0xffB8B8B8)
-                              //                           .withAlpha(100),
-                              //                       offset: const Offset(0, 4),
-                              //                       blurRadius: 8,
-                              //                       spreadRadius: 2)
-                              //                 ],
-                              //                 color: Colors.white),
-                              //             child: const Text(
-                              //               'Select',
-                              //               style: TextStyle(
-                              //                 fontFamily: "Avenir LT Std",
-                              //                 color: Color(0xFF4682B4),
-                              //                 fontSize: 20,
-                              //                 fontWeight: FontWeight.bold,
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //       )
-                              //     ],
-                              //   ),
-                              // ),
                               const SizedBox(
                                 height: 20,
                               ),
@@ -931,12 +723,6 @@ class _EditPageState extends State<EditPage> {
                                               decoration: const InputDecoration(
                                                 counterStyle:
                                                     TextStyle(fontSize: 0),
-                                                // labelText: 'Phone',
-                                                // labelStyle: TextStyle(
-                                                //   fontFamily: "Avenir LT Std",
-                                                //   color: Color(0xFFB8B8B8),
-                                                //   fontSize: 16,
-                                                // ),
                                                 border: OutlineInputBorder(
                                                   borderSide:
                                                       BorderSide(width: 20),
@@ -994,118 +780,6 @@ class _EditPageState extends State<EditPage> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              // const SizedBox(
-                              //   height: 16,
-                              // ),
-                              // const Text(
-                              //   "Select condition.",
-                              //   style: TextStyle(
-                              //     fontFamily: "Avenir LT Std",
-                              //     color: Color(0xFFB8B8B8),
-                              //     fontSize: 14,
-                              //   ),
-                              // ),
-                              // Container(
-                              //   padding: const EdgeInsets.only(
-                              //       left: 16.0, right: 16.0),
-                              //   decoration: const BoxDecoration(
-                              //     border: Border(
-                              //       bottom:
-                              //           BorderSide(color: Colors.grey, width: 1),
-                              //     ),
-                              //   ),
-                              //   child: DropdownButtonHideUnderline(
-                              //     child: DropdownButton(
-                              //       hint: const Text('Condition'),
-                              //       dropdownColor: Colors.white,
-                              //       elevation: 5,
-                              //       icon: const Icon(
-                              //         Icons.arrow_drop_down,
-                              //         color: Colors.blue,
-                              //       ),
-                              //       iconSize: 36.0,
-                              //       isExpanded: true,
-                              //       value: _disval,
-                              //       style: const TextStyle(
-                              //           color: Color(0xff2F3037), fontSize: 22.0),
-                              //       onChanged: (value) {
-                              //         setState(() {
-                              //           _disval = value.toString();
-                              //           grpnameset(_disval);
-                              //         });
-                              //       },
-                              //       items: disList.map((value) {
-                              //         return DropdownMenuItem(
-                              //           value: value,
-                              //           child: Text(
-                              //             value,
-                              //             style: const TextStyle(
-                              //               fontFamily: "Avenir LT Std",
-                              //               color: Color(0xFF000000),
-                              //               fontSize: 20,
-                              //             ),
-                              //           ),
-                              //         );
-                              //       }).toList(),
-                              //     ),
-                              //   ),
-                              // ),
-                              // const SizedBox(
-                              //   height: 16,
-                              // ),
-                              // const Text(
-                              //   "Select support group.",
-                              //   style: TextStyle(
-                              //     fontFamily: "Avenir LT Std",
-                              //     color: Color(0xFFB8B8B8),
-                              //     fontSize: 14,
-                              //   ),
-                              // ),
-                              // Container(
-                              //   padding: const EdgeInsets.only(
-                              //       left: 16.0, right: 16.0),
-                              //   decoration: const BoxDecoration(
-                              //     border: Border(
-                              //       bottom:
-                              //           BorderSide(color: Colors.grey, width: 1),
-                              //     ),
-                              //   ),
-                              //   child: DropdownButtonHideUnderline(
-                              //     child: DropdownButton(
-                              //       hint: const Text('Group'),
-                              //       dropdownColor: Colors.white,
-                              //       elevation: 5,
-                              //       icon: const Icon(
-                              //         Icons.arrow_drop_down,
-                              //         color: Colors.blue,
-                              //       ),
-                              //       iconSize: 36.0,
-                              //       isExpanded: true,
-                              //       value: grpval,
-                              //       style: const TextStyle(
-                              //           color: Color(0xff2F3037), fontSize: 22.0),
-                              //       onChanged: (value) {
-                              //         setState(() {
-                              //           grpidsearch(value.toString(), grpList);
-                              //           grpval = value.toString();
-                              //         });
-                              //       },
-                              //       items: grpname.map((value) {
-                              //         return DropdownMenuItem(
-                              //           value: value,
-                              //           child: Text(
-                              //             value,
-                              //             style: const TextStyle(
-                              //               fontFamily: "Avenir LT Std",
-                              //               color: Color(0xFF000000),
-                              //               fontSize: 20,
-                              //             ),
-                              //           ),
-                              //         );
-                              //       }).toList(),
-                              //     ),
-                              //   ),
-                              // ),
                               SizedBox(
                                 width: size.width,
                                 child: Row(
@@ -1256,64 +930,6 @@ class _EditPageState extends State<EditPage> {
                                   ],
                                 ),
                               ),
-                              // const SizedBox(
-                              //   height: 16,
-                              // ),
-                              // const Text(
-                              //   "Hospital",
-                              //   style: TextStyle(
-                              //     fontFamily: "Avenir LT Std",
-                              //     color: Color(0xFFB8B8B8),
-                              //     fontSize: 14,
-                              //   ),
-                              // ),
-                              // Container(
-                              //   padding: const EdgeInsets.only(
-                              //       left: 16.0, right: 16.0),
-                              //   decoration: const BoxDecoration(
-                              //     border: Border(
-                              //       bottom:
-                              //           BorderSide(color: Colors.grey, width: 1),
-                              //     ),
-                              //   ),
-                              //   child: DropdownButtonHideUnderline(
-                              //     child: DropdownButton(
-                              //       hint: const Text('Condition'),
-                              //       dropdownColor: Colors.white,
-                              //       elevation: 5,
-                              //       icon: const Icon(
-                              //         Icons.arrow_drop_down,
-                              //         color: Colors.blue,
-                              //       ),
-                              //       iconSize: 36.0,
-                              //       isExpanded: true,
-                              //       value: hospitalVal,
-                              //       style: const TextStyle(
-                              //           color: Color(0xff2F3037), fontSize: 22.0),
-                              //       onChanged: (value) {
-                              //         setState(() {
-                              //           hospitalVal = value.toString();
-                              //         });
-                              //       },
-                              //       items: hospitalList.map((value) {
-                              //         return DropdownMenuItem(
-                              //           value: value,
-                              //           child: Text(
-                              //             value,
-                              //             style: const TextStyle(
-                              //               fontFamily: "Avenir LT Std",
-                              //               color: Color(0xFF000000),
-                              //               fontSize: 20,
-                              //             ),
-                              //           ),
-                              //         );
-                              //       }).toList(),
-                              //     ),
-                              //   ),
-                              // ),
-                              // const SizedBox(
-                              //   height: 10,
-                              // ),
                               const SizedBox(
                                 height: 10,
                               ),
@@ -1509,10 +1125,10 @@ class _EditPageState extends State<EditPage> {
                               ),
                               InkWell(
                                 onTap: () async {
-                                  if (date == "") {
+                                  if (sentdate.toString() == "") {
                                     Fluttertoast.showToast(
                                         msg: "Please Select DOB.");
-                                  } else if (year == "") {
+                                  } else if (sentyear.toString() == "") {
                                     Fluttertoast.showToast(
                                         msg: "Please Select Year of Diagnosis");
                                   } else {
@@ -1590,32 +1206,6 @@ class _EditPageState extends State<EditPage> {
                 ),
               );
             }),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   onTap: onTabTapped, // new
-      //   selectedItemColor: const Color(0xFF71B48D),
-      //   currentIndex: 1, // this will be set when a new tab is tapped
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       icon: ImageIcon(
-      //         AssetImage("assets/images/feed.png"),
-      //       ),
-      //       label: 'FEED',
-      //       backgroundColor: null,
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: ImageIcon(
-      //         AssetImage("assets/images/chat.png"),
-      //       ),
-      //       label: 'MENTORS',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: ImageIcon(
-      //         AssetImage("assets/images/new.png"),
-      //       ),
-      //       label: "WHAT'S NEW",
-      //     ),
-      //   ],
-      // ),
     );
   }
 }
@@ -1673,47 +1263,6 @@ class Topbar extends StatelessWidget {
                       color: Color(0xFF4682B4),
                       fontFamily: "Avenir LT Std",
                     )),
-                // Flexible(
-                //   child: TextFormField(
-                //     style: const TextStyle(
-                //       fontFamily: "Avenir LT Std",
-                //       color: Color(0xFF4682B4),
-                //       fontSize: 20,
-                //     ),
-                //     decoration: const InputDecoration(
-                //       contentPadding: EdgeInsets.only(top: 10),
-                //       labelText: "Search",
-                //       labelStyle: TextStyle(
-                //         fontFamily: "Avenir LT Std",
-                //         color: Color(0xFF4682B4),
-                //         fontSize: 16,
-                //         height: 0.5,
-                //       ),
-                //     ),
-                //     keyboardType: TextInputType.emailAddress,
-                //     controller: searchController,
-                //     validator: (value) {
-                //       if (value == null) {
-                //         return 'Please Enter a value.';
-                //       }
-                //       return null;
-                //     },
-                //   ),
-                // ),
-                // GestureDetector(
-                //   onTap: () {},
-                //   child: Image.asset(
-                //     "assets/images/addec5a8-1f71-4772-96f0-843755aaaed1.png",
-                //   ),
-                // ),
-                // GestureDetector(
-                //   onTap: () {
-                //     Scaffold.of(context).openEndDrawer();
-                //   },
-                //   child: Image.asset(
-                //     "assets/images/53e933ab-b850-43e3-990f-61d635d4ac34.png",
-                //   ),
-                // ),
               ],
             ),
           ),
