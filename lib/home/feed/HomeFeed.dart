@@ -802,12 +802,13 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                       feedModel.commenting(
                                           context,
                                           postindex,
-                                          commentController,
+                                          commentController.text.trim(),
                                           name,
                                           email,
                                           feedModel.feed!.data[postindex].uuid,
                                           uimg);
                                     }
+                                    commentController.text = "";
                                   },
                                   icon: const Icon(Icons.send),
                                 ),
@@ -842,34 +843,43 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        CachedNetworkImage(
-                          imageUrl: baseurl +
-                              feedModel.feed!.data[postindex]
-                                  .comments[commentindex].userPhoto
-                                  .toString(),
-                          imageBuilder: (context, imageProvider) => Container(
-                            width: 50.0,
-                            height: 50.0,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  image: imageProvider, fit: BoxFit.cover),
-                            ),
-                          ),
-                          placeholder: (context, url) => const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.blue,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => UserProfileScreen(
+                                      email: feedModel.feed!.data[postindex]
+                                          .comments[commentindex].userEmail,
+                                    )));
+                          },
+                          child: CachedNetworkImage(
+                            imageUrl: baseurl +
+                                feedModel.feed!.data[postindex]
+                                    .comments[commentindex].userPhoto
+                                    .toString(),
+                            imageBuilder: (context, imageProvider) => Container(
+                              width: 50.0,
+                              height: 50.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    image: imageProvider, fit: BoxFit.cover),
                               ),
                             ),
+                            placeholder: (context, url) => const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: AssetImage(
+                                      "assets/images/user.png",
+                                    )),
                           ),
-                          errorWidget: (context, url, error) =>
-                              const CircleAvatar(
-                                  radius: 25,
-                                  backgroundImage: AssetImage(
-                                    "assets/images/user.png",
-                                  )),
                         ),
                         const SizedBox(
                           width: 20,

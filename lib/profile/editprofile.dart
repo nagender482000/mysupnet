@@ -36,7 +36,6 @@ class _EditPageState extends State<EditPage> {
   String doctor = "";
   String name = "";
   String hospital = "";
-  String hospitalVal = "Singapore General Hospital";
   int _gradioSelected = 1;
   String gender = "";
   String countrycode = "";
@@ -70,7 +69,7 @@ class _EditPageState extends State<EditPage> {
   TextEditingController nameController = TextEditingController();
 
   TextEditingController hospitalController = TextEditingController();
-  String formatISOTime(DateTime date) {
+  String formatISOTimetoUTC(DateTime date) {
     //converts date into the following format:
 // or 2019-06-04T12:08:56.235-0700
     var duration = date.timeZoneOffset;
@@ -144,13 +143,13 @@ class _EditPageState extends State<EditPage> {
           ),
         ),
         placeholder: (context, url) => const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
+          padding: EdgeInsets.all(8.0),
+          child: Center(
+            child: CircularProgressIndicator(
+              color: Colors.blue,
+            ),
+          ),
+        ),
         errorWidget: (context, url, error) => const CircleAvatar(
             radius: 50,
             backgroundImage: AssetImage(
@@ -166,7 +165,8 @@ class _EditPageState extends State<EditPage> {
       numb = userdata["phone"].toString();
       countrycode = userdata["country_code"].toString();
       if (userdata["date_of_birth"] != null) {
-        sentdate = formatISOTime(DateTime.parse(userdata["date_of_birth"]));
+        sentdate =
+            formatISOTimetoUTC(DateTime.parse(userdata["date_of_birth"]));
         date = DateFormat("dd-MM-yyyy")
             .format(DateTime.parse(userdata["date_of_birth"].toString()))
             .toString();
@@ -175,7 +175,8 @@ class _EditPageState extends State<EditPage> {
       }
       dateController.text = date;
       if (userdata["year_of_diagnosis"] != null) {
-        sentyear = formatISOTime(DateTime.parse(userdata["year_of_diagnosis"]));
+        sentyear =
+            formatISOTimetoUTC(DateTime.parse(userdata["year_of_diagnosis"]));
         year = DateFormat("dd-MM-yyyy")
             .format(DateTime.parse(userdata["year_of_diagnosis"].toString()))
             .toString();
@@ -278,8 +279,17 @@ class _EditPageState extends State<EditPage> {
                                         Navigator.pop(context);
                                         setState(() {
                                           if (file.path.toString() != "") {
-                                            img = Image.file(
-                                                File(file.path.toString()));
+                                            img = Container(
+                                                width: 80.0,
+                                                height: 80.0,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                      fit: BoxFit.fill,
+                                                      image: FileImage(File(file
+                                                          .path
+                                                          .toString())),
+                                                    )));
                                           }
                                         });
                                       }
@@ -562,8 +572,8 @@ class _EditPageState extends State<EditPage> {
                                             lastDate: DateTime(2025),
                                           ).then((selectedDate) {
                                             if (selectedDate != null) {
-                                              sentdate =
-                                                  formatISOTime(selectedDate);
+                                              sentdate = formatISOTimetoUTC(
+                                                  selectedDate);
                                               dateController.text =
                                                   DateFormat("dd-MM-yyyy")
                                                       .format(selectedDate);
@@ -615,8 +625,9 @@ class _EditPageState extends State<EditPage> {
                                                     lastDate: DateTime(2025),
                                                   ).then((selectedDate) {
                                                     if (selectedDate != null) {
-                                                      sentdate = formatISOTime(
-                                                          selectedDate);
+                                                      sentdate =
+                                                          formatISOTimetoUTC(
+                                                              selectedDate);
                                                       dateController
                                                           .text = DateFormat(
                                                               "dd-MM-yyyy")

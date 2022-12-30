@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:mysupnet/Apicalls/addcomment.dart';
 import 'package:mysupnet/Apicalls/bookmark.dart';
@@ -6,6 +8,8 @@ import 'package:mysupnet/Apicalls/likeapi.dart';
 import 'package:mysupnet/Apicalls/unbookmark.dart';
 import 'package:mysupnet/Apicalls/unlikeapi.dart';
 import 'package:mysupnet/home/feed/feed_Model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class FeedProvider extends ChangeNotifier {
   FeedData? feed;
@@ -16,8 +20,31 @@ class FeedProvider extends ChangeNotifier {
     isloading = true;
     var data = await postlist();
     feed = FeedData.fromJson(data);
+    await profile();
     isloading = false;
     notifyListeners();
+  }
+
+  profile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token').toString();
+    String email = prefs.getString('email').toString();
+
+    var headers = {'Authorization': 'Bearer ' + token.toString()};
+    var request = http.MultipartRequest('GET',
+        Uri.parse('https://apis.mysupnet.org/api/v1/user?email=' + email));
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+    var responsed = await http.Response.fromStream(response);
+    final responseData = json.decode(responsed.body);
+    if (response.statusCode == 200) {
+      var userdata = responseData["data"];
+      String userimg = userdata["photo"].toString();
+
+      prefs.setString('img', userimg);
+    }
   }
 
   void postLike(String id, index) async {
@@ -85,13 +112,12 @@ class FeedProvider extends ChangeNotifier {
     await unlikeapi(id);
   }
 
-  void commenting(context, postindex, commentController, userName, userEmail,
-      postUuid, userPhoto) async {
+  void commenting(context, postindex, comment, userName, userEmail, postUuid,
+      userPhoto) async {
     iscommenting = true;
-
     feed!.data[postindex].comments.add(Comment(
         uuid: "uuid",
-        text: commentController.text,
+        text: comment,
         created: DateTime.now(),
         updated: DateTime.now(),
         userName: userName,
@@ -100,16 +126,14 @@ class FeedProvider extends ChangeNotifier {
         userPhoto: userPhoto,
         currentUserHasLiked: false,
         likes: 0));
-    commentController.text = "";
     feed!.data[postindex].commentCount += 1;
-     iscommenting = false;
+    iscommenting = false;
 
     notifyListeners();
     await addcomment(
       context,
       feed!.data[postindex].uuid,
-      commentController.text,
+      comment,
     );
-   
   }
 }

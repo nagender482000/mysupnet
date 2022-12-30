@@ -112,7 +112,8 @@ class _AddNewPostState extends State<AddNewPost> {
                   alignment: Alignment.center,
                   child: TextFormField(
                     keyboardType: TextInputType.multiline,
-                    maxLines: 34,
+                    maxLength: 250,
+                    maxLines: 32,
                     style: const TextStyle(
                       fontFamily: "Avenir LT Std",
                       color: Color(0xFF000000),
@@ -156,7 +157,7 @@ class _AddNewPostState extends State<AddNewPost> {
                       widget.isEditPost
                           ? await editpost(context, widget.id.toString(),
                               postController.text)
-                          : await addpost(context, postController.text);
+                          : await addpost(context, postController.text.trim());
                     },
                     child: Container(
                       width: size.width,

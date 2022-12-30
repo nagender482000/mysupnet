@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mysupnet/Apicalls/forgotapi.dart';
+import 'package:pinput/pinput.dart';
 
 class ForgotPassBottomSheet extends StatefulWidget {
   final String email;
@@ -14,12 +15,33 @@ class ForgotPassBottomSheet extends StatefulWidget {
 class _ForgotPassBottomSheetState extends State<ForgotPassBottomSheet> {
   final passwordController = TextEditingController();
   final confirmpasswordController = TextEditingController();
-
+  final otpController = TextEditingController();
+  final defaultPinTheme = PinTheme(
+    width: 60,
+    height: 60,
+    textStyle: const TextStyle(
+        fontSize: 20,
+        color: Color.fromRGBO(30, 60, 87, 1),
+        fontWeight: FontWeight.w600),
+    decoration: BoxDecoration(
+      border: Border.all(color: const Color.fromRGBO(234, 239, 243, 1)),
+      borderRadius: BorderRadius.circular(20),
+    ),
+  );
   bool isloading = false;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final focusedPinTheme = defaultPinTheme.copyDecorationWith(
+      border: Border.all(color: const Color.fromRGBO(114, 178, 238, 1)),
+      borderRadius: BorderRadius.circular(8),
+    );
 
+    final submittedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration!.copyWith(
+        color: const Color.fromRGBO(234, 239, 243, 1),
+      ),
+    );
     return Container(
       // padding: const EdgeInsets.symmetric(
       //   horizontal: 25,
@@ -39,8 +61,9 @@ class _ForgotPassBottomSheetState extends State<ForgotPassBottomSheet> {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              SizedBox(height: size.height * 0.01),
               const Text(
-                "Enter new Password",
+                "Enter OTP sent on your mail & your new password to reset: ",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: "Avenir LT Std",
@@ -50,6 +73,23 @@ class _ForgotPassBottomSheetState extends State<ForgotPassBottomSheet> {
                 ),
               ),
               SizedBox(height: size.height * 0.02),
+              Pinput(
+                defaultPinTheme: defaultPinTheme,
+                focusedPinTheme: focusedPinTheme,
+                submittedPinTheme: submittedPinTheme,
+                validator: (s) {
+                  if (s!.length != 4) {
+                    Fluttertoast.showToast(msg: "Enter Proper");
+                  }
+                  return null;
+                },
+                pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
+                showCursor: true,
+                onCompleted: (pin) async {
+                  otpController.text = pin;
+                },
+              ),
+              SizedBox(height: size.height * 0.01),
               Container(
                 alignment: Alignment.center,
                 margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -110,19 +150,22 @@ class _ForgotPassBottomSheetState extends State<ForgotPassBottomSheet> {
                 padding: const EdgeInsets.all(20.0),
                 child: InkWell(
                   onTap: () async {
-                    if (confirmpasswordController.text ==
-                        passwordController.text) {
-                      setState(() {
-                        isloading = true;
-                      });
-                      await fpass(
-                          context, widget.email, passwordController.text);
-                      //await forgot(context, emailController.text);
-                      setState(() {
-                        isloading = false;
-                      });
+                    if (passwordController.text.isEmpty) {
+                      Fluttertoast.showToast(msg: "Please Enter Password.");
                     } else {
-                      Fluttertoast.showToast(msg: "Password Mismatch!!");
+                      if (confirmpasswordController.text !=
+                          passwordController.text) {
+                        Fluttertoast.showToast(msg: "Password Mismatch!!");
+                      } else {
+                        setState(() {
+                          isloading = true;
+                        });
+                        await fpass(context, widget.email, otpController.text,
+                            passwordController.text);
+                        setState(() {
+                          isloading = false;
+                        });
+                      }
                     }
                   },
                   child: isloading
