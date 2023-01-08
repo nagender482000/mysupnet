@@ -109,7 +109,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                         ),
                         const SizedBox(height: 16),
                         buildMenuItem(
-                          text: 'DISEASE RESOURCES',
+                          text: 'RESOURCES',
                           licon: Icons.support,
                           onClicked: () => selectedItem(context, 1),
                         ),

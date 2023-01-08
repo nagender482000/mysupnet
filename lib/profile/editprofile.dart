@@ -7,7 +7,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl/intl.dart';
 
@@ -29,6 +28,7 @@ class EditPage extends StatefulWidget {
 class _EditPageState extends State<EditPage> {
   LinkedHashMap<String, dynamic> userdata = LinkedHashMap();
   var isLoading = true;
+  bool isButtonLoading = false;
   String numb = "";
   String date = "";
   String year = "";
@@ -56,6 +56,7 @@ class _EditPageState extends State<EditPage> {
       ));
   String sentdate = "";
   String sentyear = "";
+  Map<String, String> message = {};
   TextEditingController emailController = TextEditingController();
 
   TextEditingController dateController = TextEditingController();
@@ -69,17 +70,7 @@ class _EditPageState extends State<EditPage> {
   TextEditingController nameController = TextEditingController();
 
   TextEditingController hospitalController = TextEditingController();
-  String formatISOTimetoUTC(DateTime date) {
-    //converts date into the following format:
-// or 2019-06-04T12:08:56.235-0700
-    var duration = date.timeZoneOffset;
-    if (duration.isNegative)
-      return (DateFormat("yyyy-MM-ddTHH:mm:ss.mmm").format(date) +
-          "-${duration.inHours.toString().padLeft(2, '0')}${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}");
-    else
-      return (DateFormat("yyyy-MM-ddTHH:mm:ss.mmm").format(date) +
-          "+${duration.inHours.toString().padLeft(2, '0')}${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}");
-  }
+
 
   @override
   void initState() {
@@ -165,8 +156,7 @@ class _EditPageState extends State<EditPage> {
       numb = userdata["phone"].toString();
       countrycode = userdata["country_code"].toString();
       if (userdata["date_of_birth"] != null) {
-        sentdate =
-            formatISOTimetoUTC(DateTime.parse(userdata["date_of_birth"]));
+        sentdate = DateTime.parse(userdata["date_of_birth"]).toString();
         date = DateFormat("dd-MM-yyyy")
             .format(DateTime.parse(userdata["date_of_birth"].toString()))
             .toString();
@@ -175,8 +165,7 @@ class _EditPageState extends State<EditPage> {
       }
       dateController.text = date;
       if (userdata["year_of_diagnosis"] != null) {
-        sentyear =
-            formatISOTimetoUTC(DateTime.parse(userdata["year_of_diagnosis"]));
+        sentyear = DateTime.parse(userdata["year_of_diagnosis"]).toString();
         year = DateFormat("dd-MM-yyyy")
             .format(DateTime.parse(userdata["year_of_diagnosis"].toString()))
             .toString();
@@ -572,8 +561,10 @@ class _EditPageState extends State<EditPage> {
                                             lastDate: DateTime(2025),
                                           ).then((selectedDate) {
                                             if (selectedDate != null) {
-                                              sentdate = formatISOTimetoUTC(
-                                                  selectedDate);
+                                              sentdate = DateTime.parse(
+                                                      selectedDate.toString())
+                                                  .toString();
+
                                               dateController.text =
                                                   DateFormat("dd-MM-yyyy")
                                                       .format(selectedDate);
@@ -625,9 +616,10 @@ class _EditPageState extends State<EditPage> {
                                                     lastDate: DateTime(2025),
                                                   ).then((selectedDate) {
                                                     if (selectedDate != null) {
-                                                      sentdate =
-                                                          formatISOTimetoUTC(
-                                                              selectedDate);
+                                                      sentdate = DateTime.parse(
+                                                              selectedDate
+                                                                  .toString())
+                                                          .toString();
                                                       dateController
                                                           .text = DateFormat(
                                                               "dd-MM-yyyy")
@@ -807,8 +799,9 @@ class _EditPageState extends State<EditPage> {
                                             lastDate: DateTime(2025),
                                           ).then((selectedDate) {
                                             if (selectedDate != null) {
-                                              sentyear =
-                                                  selectedDate.toString();
+                                              sentyear = DateTime.parse(
+                                                      selectedDate.toString())
+                                                  .toString();
                                               yearController.text =
                                                   DateFormat("dd-MM-yyyy")
                                                       .format(selectedDate);
@@ -860,7 +853,9 @@ class _EditPageState extends State<EditPage> {
                                                     lastDate: DateTime(2025),
                                                   ).then((selectedDate) {
                                                     if (selectedDate != null) {
-                                                      sentyear = selectedDate
+                                                      sentyear = DateTime.parse(
+                                                              selectedDate
+                                                                  .toString())
                                                           .toString();
                                                       yearController
                                                           .text = DateFormat(
@@ -1134,77 +1129,119 @@ class _EditPageState extends State<EditPage> {
                               const SizedBox(
                                 height: 30,
                               ),
-                              InkWell(
-                                onTap: () async {
-                                  if (sentdate.toString() == "") {
-                                    Fluttertoast.showToast(
-                                        msg: "Please Select DOB.");
-                                  } else if (sentyear.toString() == "") {
-                                    Fluttertoast.showToast(
-                                        msg: "Please Select Year of Diagnosis");
-                                  } else {
-                                    await edit(
-                                      context,
-                                      nameController.text,
-                                      gender,
-                                      sentdate,
-                                      countrycode,
-                                      numb,
-                                      sentyear,
-                                      hospitalController.text,
-                                      medicationController.text,
-                                      doctorController.text,
-                                      toBeginningOfSentenceCase(
-                                          hide_email.toString()),
-                                      toBeginningOfSentenceCase(
-                                          hide_gender.toString()),
-                                      toBeginningOfSentenceCase(
-                                          hide_date_of_birth.toString()),
-                                      toBeginningOfSentenceCase(
-                                          hide_phone.toString()),
-                                      toBeginningOfSentenceCase(
-                                          hide_support_group.toString()),
-                                      toBeginningOfSentenceCase(
-                                          hide_condition.toString()),
-                                      toBeginningOfSentenceCase(
-                                          hide_year_of_diagnosis.toString()),
-                                      toBeginningOfSentenceCase(
-                                          hide_hospital.toString()),
-                                      toBeginningOfSentenceCase(
-                                          hide_medications.toString()),
-                                      toBeginningOfSentenceCase(
-                                          hide_doctor.toString()),
-                                    );
-                                  }
-                                },
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 13),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(4)),
-                                      boxShadow: <BoxShadow>[
-                                        BoxShadow(
-                                            color: const Color(0xffB8B8B8)
-                                                .withAlpha(100),
-                                            offset: const Offset(0, 4),
-                                            blurRadius: 8,
-                                            spreadRadius: 2)
-                                      ],
-                                      color: const Color(0xFF71B48D)),
-                                  child: const Text(
-                                    'SAVE',
-                                    style: TextStyle(
-                                      fontFamily: "Avenir LT Std",
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
+                              isButtonLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.green,
+                                      ),
+                                    )
+                                  : InkWell(
+                                      onTap: () async {
+                                        setState(() {
+                                          isButtonLoading = true;
+                                        });
+                                        message = {
+                                          'name':
+                                              nameController.text.toString(),
+                                          'gender': gender.toString(),
+                                          'country_code':
+                                              countrycode.toString(),
+                                          'phone': numb.toString(),
+                                          'hospital': hospitalController.text
+                                              .toString(),
+                                          'medications': medicationController
+                                              .text
+                                              .toString(),
+                                          'physician':
+                                              doctorController.text.toString(),
+                                          "hide_email":
+                                              toBeginningOfSentenceCase(
+                                                      hide_email.toString())
+                                                  .toString(),
+                                          "hide_gender":
+                                              toBeginningOfSentenceCase(
+                                                      hide_gender.toString())
+                                                  .toString(),
+                                          "hide_date_of_birth":
+                                              toBeginningOfSentenceCase(
+                                                      hide_date_of_birth
+                                                          .toString())
+                                                  .toString(),
+                                          "hide_phone":
+                                              toBeginningOfSentenceCase(
+                                                      hide_phone.toString())
+                                                  .toString(),
+                                          "hide_support_group":
+                                              toBeginningOfSentenceCase(
+                                                      hide_support_group
+                                                          .toString())
+                                                  .toString(),
+                                          "hide_condition":
+                                              toBeginningOfSentenceCase(
+                                                      hide_condition.toString())
+                                                  .toString(),
+                                          "hide_year_of_diagnosis":
+                                              toBeginningOfSentenceCase(
+                                                      hide_year_of_diagnosis
+                                                          .toString())
+                                                  .toString(),
+                                          "hide_hospital":
+                                              toBeginningOfSentenceCase(
+                                                      hide_hospital.toString())
+                                                  .toString(),
+                                          "hide_medications":
+                                              toBeginningOfSentenceCase(
+                                                      hide_medications
+                                                          .toString())
+                                                  .toString(),
+                                          "hide_doctor":
+                                              toBeginningOfSentenceCase(
+                                                      hide_doctor.toString())
+                                                  .toString(),
+                                        };
+                                        if (sentdate.isNotEmpty) {
+                                          message['date_of_birth'] =
+                                              sentdate.toString();
+                                        }
+                                        if (sentyear.isNotEmpty) {
+                                          message['year_of_diagnosis'] =
+                                              sentyear.toString();
+                                        }
+                                        await edit(context, message);
+                                        setState(() {
+                                          isButtonLoading = false;
+                                        });
+                                      },
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 13),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(4)),
+                                            boxShadow: <BoxShadow>[
+                                              BoxShadow(
+                                                  color: const Color(0xffB8B8B8)
+                                                      .withAlpha(100),
+                                                  offset: const Offset(0, 4),
+                                                  blurRadius: 8,
+                                                  spreadRadius: 2)
+                                            ],
+                                            color: const Color(0xFF71B48D)),
+                                        child: const Text(
+                                          'SAVE',
+                                          style: TextStyle(
+                                            fontFamily: "Avenir LT Std",
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ),
                               const SizedBox(
                                 height: 20,
                               ),
