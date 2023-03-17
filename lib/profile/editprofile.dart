@@ -14,7 +14,9 @@ import 'package:http/http.dart' as http;
 import 'package:mysupnet/Apicalls/edit.dart';
 import 'package:mysupnet/Apicalls/profilePic.dart';
 import 'package:mysupnet/global.dart';
+import 'package:mysupnet/home/feed/FeedProvider.dart';
 import 'package:mysupnet/profile/profile.dart';
+import 'package:provider/provider.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -70,7 +72,6 @@ class _EditPageState extends State<EditPage> {
   TextEditingController nameController = TextEditingController();
 
   TextEditingController hospitalController = TextEditingController();
-
 
   @override
   void initState() {
@@ -202,378 +203,216 @@ class _EditPageState extends State<EditPage> {
     } else {
       _gradioSelected = 2;
     }
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Builder(builder: (context) {
-              return SizedBox(
-                height: size.height * 2,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Topbar(size: size),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      SizedBox(
-                        width: size.width * 0.9,
-                        child: Center(
+    return Consumer<FeedProvider>(
+        builder: (context, feedModel, _) => Scaffold(
+              backgroundColor: Colors.white,
+              body: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Builder(builder: (context) {
+                      return SizedBox(
+                        height: size.height * 2,
+                        child: SingleChildScrollView(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Row(
-                                children: [
-                                  Flexible(child: img),
-                                  const SizedBox(
-                                    width: 50,
-                                  ),
-                                  InkWell(
-                                    onTap: () async {
-                                      FilePickerResult? result =
-                                          await FilePicker.platform.pickFiles();
+                              Topbar(size: size),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              SizedBox(
+                                width: size.width * 0.9,
+                                child: Center(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Flexible(child: img),
+                                          const SizedBox(
+                                            width: 50,
+                                          ),
+                                          InkWell(
+                                            onTap: () async {
+                                              FilePickerResult? result =
+                                                  await FilePicker.platform
+                                                      .pickFiles();
 
-                                      if (result != null) {
-                                        PlatformFile file = result.files.first;
-                                        print(file.name);
-                                        print(file.path);
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                backgroundColor: Colors.white,
-                                                content: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: const [
-                                                    CircularProgressIndicator
-                                                        .adaptive(),
-                                                    SizedBox(
-                                                      height: 20,
-                                                    ),
-                                                    Text(
-                                                      "Uploading...",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 17,
-                                                      ),
-                                                    ),
-                                                  ],
+                                              if (result != null) {
+                                                PlatformFile file =
+                                                    result.files.first;
+                                                print(file.name);
+                                                print(file.path);
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        content: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: const [
+                                                            CircularProgressIndicator
+                                                                .adaptive(),
+                                                            SizedBox(
+                                                              height: 20,
+                                                            ),
+                                                            Text(
+                                                              "Uploading...",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 17,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    });
+                                                await profilepic(file.path);
+                                                await feedModel.getpost();
+                                                Navigator.pop(context);
+                                                setState(() {
+                                                  if (file.path.toString() !=
+                                                      "") {
+                                                    img = Container(
+                                                        width: 80.0,
+                                                        height: 80.0,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                image:
+                                                                    DecorationImage(
+                                                                  fit: BoxFit
+                                                                      .fill,
+                                                                  image: FileImage(
+                                                                      File(file
+                                                                          .path
+                                                                          .toString())),
+                                                                )));
+                                                  }
+                                                });
+                                              }
+                                            },
+                                            child: Container(
+                                              width: size.width * 0.4,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 13),
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(4)),
+                                                  border: Border.all(
+                                                      color: Colors.green),
+                                                  color: Colors.white),
+                                              child: const Text(
+                                                'UPLOAD IMAGE',
+                                                style: TextStyle(
+                                                  fontFamily: "Avenir LT Std",
+                                                  color: Color(0xFF4078A6),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                              );
-                                            });
-                                        await profilepic(file.path);
-                                        Navigator.pop(context);
-                                        setState(() {
-                                          if (file.path.toString() != "") {
-                                            img = Container(
-                                                width: 80.0,
-                                                height: 80.0,
-                                                decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: DecorationImage(
-                                                      fit: BoxFit.fill,
-                                                      image: FileImage(File(file
-                                                          .path
-                                                          .toString())),
-                                                    )));
-                                          }
-                                        });
-                                      }
-                                    },
-                                    child: Container(
-                                      width: size.width * 0.4,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 13),
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(4)),
-                                          border:
-                                              Border.all(color: Colors.green),
-                                          color: Colors.white),
-                                      child: const Text(
-                                        'UPLOAD IMAGE',
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: size.height * 0.03),
+                                      const Text(
+                                        "Personal Information",
                                         style: TextStyle(
                                           fontFamily: "Avenir LT Std",
-                                          color: Color(0xFF4078A6),
-                                          fontSize: 14,
+                                          color: Color(0xFF4682B4),
+                                          fontSize: 22,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: size.height * 0.03),
-                              const Text(
-                                "Personal Information",
-                                style: TextStyle(
-                                  fontFamily: "Avenir LT Std",
-                                  color: Color(0xFF4682B4),
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              SizedBox(
-                                width: size.width,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: size.width * 0.75,
-                                      alignment: Alignment.center,
-                                      child: TextFormField(
-                                        style: const TextStyle(
-                                          fontFamily: "Avenir LT Std",
-                                          color: Color(0xFF000000),
-                                          fontSize: 20,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          labelText: "Full Name",
-                                          labelStyle: TextStyle(
-                                            fontFamily: "Avenir LT Std",
-                                            color: Color(0xFFB8B8B8),
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.name,
-                                        controller: nameController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please Enter Name';
-                                          }
-                                          return null;
-                                        },
+                                      const SizedBox(
+                                        height: 10,
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Column(
-                                        children: [
-                                          const Text(
-                                            "Visble to all?",
-                                            style: TextStyle(
-                                              fontFamily: "Avenir LT Std",
-                                              color: Color(0xFF4682B4),
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          Switch(
-                                            onChanged: (asd) {},
-                                            value: true,
-                                            activeColor:
-                                                const Color(0xFF4682B4),
-                                            activeTrackColor:
-                                                const Color(0xFF4682B4),
-                                            inactiveThumbColor: Colors.grey,
-                                            inactiveTrackColor: Colors.grey,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              SizedBox(
-                                width: size.width,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: size.width * 0.75,
-                                      alignment: Alignment.center,
-                                      child: TextFormField(
-                                        enabled: false,
-                                        style: const TextStyle(
-                                          fontFamily: "Avenir LT Std",
-                                          color: Color(0xFF000000),
-                                          fontSize: 20,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          labelText: "Email",
-                                          labelStyle: TextStyle(
-                                            fontFamily: "Avenir LT Std",
-                                            color: Color(0xFFB8B8B8),
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                        controller: emailController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please Enter Email';
-                                          } else if (!value.contains('@')) {
-                                            return 'Please Enter Valid Email';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Switch(
-                                        onChanged: (asc) {
-                                          if (hide_email == true) {
-                                            setState(() {
-                                              hide_email = false;
-                                            });
-                                            print('Switch Button is OFF');
-                                          } else {
-                                            setState(() {
-                                              hide_email = true;
-                                            });
-                                            print('Switch Button is ON');
-                                          }
-                                        },
-                                        value: hide_email,
-                                        activeColor: const Color(0xFF4682B4),
-                                        activeTrackColor:
-                                            const Color(0xFF4682B4),
-                                        inactiveThumbColor: Colors.grey,
-                                        inactiveTrackColor: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Text(
-                                "Gender",
-                                style: TextStyle(
-                                  fontFamily: "Avenir LT Std",
-                                  color: Color(0xFFB8B8B8),
-                                  fontSize: 14,
-                                ),
-                              ),
-                              SizedBox(
-                                width: size.width,
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: size.width * .75,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            width: size.width * 0.06,
-                                          ),
-                                          Radio(
-                                            value: 1,
-                                            groupValue: _gradioSelected,
-                                            activeColor: Colors.blue,
-                                            onChanged: (int? value) {
-                                              setState(() {
-                                                _gradioSelected = value!;
-                                                gender = 'Male';
-                                              });
-                                            },
-                                          ),
-                                          const Text(
-                                            "Male",
-                                            style: TextStyle(
-                                              fontFamily: "Avenir LT Std",
-                                              color: Color(0xFF000000),
-                                              fontSize: 20,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: size.width * 0.1,
-                                          ),
-                                          Radio(
-                                            value: 2,
-                                            groupValue: _gradioSelected,
-                                            activeColor: Colors.blue,
-                                            onChanged: (int? value) {
-                                              setState(() {
-                                                _gradioSelected = value!;
-                                                gender = 'Female';
-                                              });
-                                            },
-                                          ),
-                                          const Text(
-                                            "Female",
-                                            style: TextStyle(
-                                              fontFamily: "Avenir LT Std",
-                                              color: Color(0xFF000000),
-                                              fontSize: 20,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Switch(
-                                        onChanged: (asc) {
-                                          if (hide_gender == true) {
-                                            setState(() {
-                                              hide_gender = false;
-                                            });
-                                            print('Switch Button is OFF');
-                                          } else {
-                                            setState(() {
-                                              hide_gender = true;
-                                            });
-                                            print('Switch Button is ON');
-                                          }
-                                        },
-                                        value: hide_gender,
-                                        activeColor: const Color(0xFF4682B4),
-                                        activeTrackColor:
-                                            const Color(0xFF4682B4),
-                                        inactiveThumbColor: Colors.grey,
-                                        inactiveTrackColor: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: size.width,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: size.width * .75,
-                                      alignment: Alignment.center,
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          await showDatePicker(
-                                            context: context,
-                                            initialDate: DateTime.now(),
-                                            firstDate: DateTime(1900),
-                                            lastDate: DateTime(2025),
-                                          ).then((selectedDate) {
-                                            if (selectedDate != null) {
-                                              sentdate = DateTime.parse(
-                                                      selectedDate.toString())
-                                                  .toString();
-
-                                              dateController.text =
-                                                  DateFormat("dd-MM-yyyy")
-                                                      .format(selectedDate);
-                                            }
-                                          });
-                                        },
+                                      SizedBox(
+                                        width: size.width,
                                         child: Row(
                                           children: [
+                                            Container(
+                                              width: size.width * 0.75,
+                                              alignment: Alignment.center,
+                                              child: TextFormField(
+                                                style: const TextStyle(
+                                                  fontFamily: "Avenir LT Std",
+                                                  color: Color(0xFF000000),
+                                                  fontSize: 20,
+                                                ),
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: "Full Name",
+                                                  labelStyle: TextStyle(
+                                                    fontFamily: "Avenir LT Std",
+                                                    color: Color(0xFFB8B8B8),
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                keyboardType:
+                                                    TextInputType.name,
+                                                controller: nameController,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please Enter Name';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
                                             Flexible(
+                                              child: Column(
+                                                children: [
+                                                  const Text(
+                                                    "Visble to all?",
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          "Avenir LT Std",
+                                                      color: Color(0xFF4682B4),
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  Switch(
+                                                    onChanged: (asd) {},
+                                                    value: true,
+                                                    activeColor:
+                                                        const Color(0xFF4682B4),
+                                                    activeTrackColor:
+                                                        const Color(0xFF4682B4),
+                                                    inactiveThumbColor:
+                                                        Colors.grey,
+                                                    inactiveTrackColor:
+                                                        Colors.grey,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      SizedBox(
+                                        width: size.width,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: size.width * 0.75,
+                                              alignment: Alignment.center,
                                               child: TextFormField(
                                                 enabled: false,
                                                 style: const TextStyle(
@@ -583,8 +422,7 @@ class _EditPageState extends State<EditPage> {
                                                 ),
                                                 decoration:
                                                     const InputDecoration(
-                                                  labelText:
-                                                      "DOB (Date of Birth)",
+                                                  labelText: "Email",
                                                   labelStyle: TextStyle(
                                                     fontFamily: "Avenir LT Std",
                                                     color: Color(0xFFB8B8B8),
@@ -592,22 +430,164 @@ class _EditPageState extends State<EditPage> {
                                                   ),
                                                 ),
                                                 keyboardType:
-                                                    TextInputType.name,
-                                                controller: dateController,
+                                                    TextInputType.emailAddress,
+                                                controller: emailController,
                                                 validator: (value) {
                                                   if (value == null ||
                                                       value.isEmpty) {
-                                                    return 'Please Enter Date';
+                                                    return 'Please Enter Email';
+                                                  } else if (!value
+                                                      .contains('@')) {
+                                                    return 'Please Enter Valid Email';
                                                   }
                                                   return null;
                                                 },
                                               ),
                                             ),
                                             const SizedBox(
-                                              width: 50,
+                                              width: 10,
                                             ),
                                             Flexible(
-                                              child: InkWell(
+                                              child: Switch(
+                                                onChanged: (asc) {
+                                                  if (hide_email == true) {
+                                                    setState(() {
+                                                      hide_email = false;
+                                                    });
+                                                    print(
+                                                        'Switch Button is OFF');
+                                                  } else {
+                                                    setState(() {
+                                                      hide_email = true;
+                                                    });
+                                                    print(
+                                                        'Switch Button is ON');
+                                                  }
+                                                },
+                                                value: hide_email,
+                                                activeColor:
+                                                    const Color(0xFF4682B4),
+                                                activeTrackColor:
+                                                    const Color(0xFF4682B4),
+                                                inactiveThumbColor: Colors.grey,
+                                                inactiveTrackColor: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Text(
+                                        "Gender",
+                                        style: TextStyle(
+                                          fontFamily: "Avenir LT Std",
+                                          color: Color(0xFFB8B8B8),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: size.width,
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: size.width * .75,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                    width: size.width * 0.06,
+                                                  ),
+                                                  Radio(
+                                                    value: 1,
+                                                    groupValue: _gradioSelected,
+                                                    activeColor: Colors.blue,
+                                                    onChanged: (int? value) {
+                                                      setState(() {
+                                                        _gradioSelected =
+                                                            value!;
+                                                        gender = 'Male';
+                                                      });
+                                                    },
+                                                  ),
+                                                  const Text(
+                                                    "Male",
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          "Avenir LT Std",
+                                                      color: Color(0xFF000000),
+                                                      fontSize: 20,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: size.width * 0.1,
+                                                  ),
+                                                  Radio(
+                                                    value: 2,
+                                                    groupValue: _gradioSelected,
+                                                    activeColor: Colors.blue,
+                                                    onChanged: (int? value) {
+                                                      setState(() {
+                                                        _gradioSelected =
+                                                            value!;
+                                                        gender = 'Female';
+                                                      });
+                                                    },
+                                                  ),
+                                                  const Text(
+                                                    "Female",
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          "Avenir LT Std",
+                                                      color: Color(0xFF000000),
+                                                      fontSize: 20,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Flexible(
+                                              child: Switch(
+                                                onChanged: (asc) {
+                                                  if (hide_gender == true) {
+                                                    setState(() {
+                                                      hide_gender = false;
+                                                    });
+                                                    print(
+                                                        'Switch Button is OFF');
+                                                  } else {
+                                                    setState(() {
+                                                      hide_gender = true;
+                                                    });
+                                                    print(
+                                                        'Switch Button is ON');
+                                                  }
+                                                },
+                                                value: hide_gender,
+                                                activeColor:
+                                                    const Color(0xFF4682B4),
+                                                activeTrackColor:
+                                                    const Color(0xFF4682B4),
+                                                inactiveThumbColor: Colors.grey,
+                                                inactiveTrackColor: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: size.width,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: size.width * .75,
+                                              alignment: Alignment.center,
+                                              child: GestureDetector(
                                                 onTap: () async {
                                                   await showDatePicker(
                                                     context: context,
@@ -620,6 +600,7 @@ class _EditPageState extends State<EditPage> {
                                                               selectedDate
                                                                   .toString())
                                                           .toString();
+
                                                       dateController
                                                           .text = DateFormat(
                                                               "dd-MM-yyyy")
@@ -627,224 +608,262 @@ class _EditPageState extends State<EditPage> {
                                                     }
                                                   });
                                                 },
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 10),
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                                  .all(
-                                                              Radius.circular(
-                                                                  4)),
-                                                      boxShadow: <BoxShadow>[
-                                                        BoxShadow(
-                                                            color: const Color(
-                                                                    0xffB8B8B8)
-                                                                .withAlpha(100),
-                                                            offset:
-                                                                const Offset(
-                                                                    0, 4),
-                                                            blurRadius: 8,
-                                                            spreadRadius: 2)
-                                                      ],
-                                                      color: Colors.white),
-                                                  child: const Text(
-                                                    'Select',
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          "Avenir LT Std",
-                                                      color: Color(0xFF4682B4),
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                child: Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: TextFormField(
+                                                        enabled: false,
+                                                        style: const TextStyle(
+                                                          fontFamily:
+                                                              "Avenir LT Std",
+                                                          color:
+                                                              Color(0xFF000000),
+                                                          fontSize: 20,
+                                                        ),
+                                                        decoration:
+                                                            const InputDecoration(
+                                                          labelText:
+                                                              "DOB (Date of Birth)",
+                                                          labelStyle: TextStyle(
+                                                            fontFamily:
+                                                                "Avenir LT Std",
+                                                            color: Color(
+                                                                0xFFB8B8B8),
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                        keyboardType:
+                                                            TextInputType.name,
+                                                        controller:
+                                                            dateController,
+                                                        validator: (value) {
+                                                          if (value == null ||
+                                                              value.isEmpty) {
+                                                            return 'Please Enter Date';
+                                                          }
+                                                          return null;
+                                                        },
+                                                      ),
                                                     ),
-                                                  ),
+                                                    const SizedBox(
+                                                      width: 50,
+                                                    ),
+                                                    Flexible(
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          await showDatePicker(
+                                                            context: context,
+                                                            initialDate:
+                                                                DateTime.now(),
+                                                            firstDate:
+                                                                DateTime(1900),
+                                                            lastDate:
+                                                                DateTime(2025),
+                                                          ).then(
+                                                              (selectedDate) {
+                                                            if (selectedDate !=
+                                                                null) {
+                                                              sentdate = DateTime.parse(
+                                                                      selectedDate
+                                                                          .toString())
+                                                                  .toString();
+                                                              dateController
+                                                                  .text = DateFormat(
+                                                                      "dd-MM-yyyy")
+                                                                  .format(
+                                                                      selectedDate);
+                                                            }
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  vertical: 10),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  borderRadius:
+                                                                      const BorderRadius
+                                                                              .all(
+                                                                          Radius.circular(
+                                                                              4)),
+                                                                  boxShadow: <
+                                                                      BoxShadow>[
+                                                                    BoxShadow(
+                                                                        color: const Color(0xffB8B8B8).withAlpha(
+                                                                            100),
+                                                                        offset: const Offset(
+                                                                            0,
+                                                                            4),
+                                                                        blurRadius:
+                                                                            8,
+                                                                        spreadRadius:
+                                                                            2)
+                                                                  ],
+                                                                  color: Colors
+                                                                      .white),
+                                                          child: const Text(
+                                                            'Select',
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  "Avenir LT Std",
+                                                              color: Color(
+                                                                  0xFF4682B4),
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
                                                 ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Switch(
-                                        onChanged: (asc) {
-                                          if (hide_date_of_birth == true) {
-                                            setState(() {
-                                              hide_date_of_birth = false;
-                                            });
-                                            print('Switch Button is OFF');
-                                          } else {
-                                            setState(() {
-                                              hide_date_of_birth = true;
-                                            });
-                                            print('Switch Button is ON');
-                                          }
-                                        },
-                                        value: hide_date_of_birth,
-                                        activeColor: const Color(0xFF4682B4),
-                                        activeTrackColor:
-                                            const Color(0xFF4682B4),
-                                        inactiveThumbColor: Colors.grey,
-                                        inactiveTrackColor: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              SizedBox(
-                                width: size.width,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                        height: 100,
-                                        width: size.width * .75,
-                                        alignment: Alignment.topLeft,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              "Phone",
-                                              style: TextStyle(
-                                                fontFamily: "Avenir LT Std",
-                                                color: Color(0xFFB8B8B8),
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                            IntlPhoneField(
-                                              decoration: const InputDecoration(
-                                                counterStyle:
-                                                    TextStyle(fontSize: 0),
-                                                border: OutlineInputBorder(
-                                                  borderSide:
-                                                      BorderSide(width: 20),
-                                                ),
-                                              ),
-                                              initialCountryCode: countrycode,
-                                              initialValue: numb,
-                                              onChanged: (phone) {
-                                                countrycode = phone
-                                                    .countryISOCode
-                                                    .toString();
-                                                numb = phone.number.toString();
-                                              },
-                                            ),
-                                          ],
-                                        )),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Switch(
-                                        onChanged: (asc) {
-                                          if (hide_phone == true) {
-                                            setState(() {
-                                              hide_phone = false;
-                                            });
-                                            print('Switch Button is OFF');
-                                          } else {
-                                            setState(() {
-                                              hide_phone = true;
-                                            });
-                                            print('Switch Button is ON');
-                                          }
-                                        },
-                                        value: hide_phone,
-                                        activeColor: const Color(0xFF4682B4),
-                                        activeTrackColor:
-                                            const Color(0xFF4682B4),
-                                        inactiveThumbColor: Colors.grey,
-                                        inactiveTrackColor: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 16,
-                              ),
-                              const Text(
-                                "Disease Information",
-                                style: TextStyle(
-                                  fontFamily: "Avenir LT Std",
-                                  color: Color(0xFF4682B4),
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(
-                                width: size.width,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: size.width * .75,
-                                      alignment: Alignment.center,
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          await showDatePicker(
-                                            context: context,
-                                            initialDate: DateTime.now(),
-                                            firstDate: DateTime(1900),
-                                            lastDate: DateTime(2025),
-                                          ).then((selectedDate) {
-                                            if (selectedDate != null) {
-                                              sentyear = DateTime.parse(
-                                                      selectedDate.toString())
-                                                  .toString();
-                                              yearController.text =
-                                                  DateFormat("dd-MM-yyyy")
-                                                      .format(selectedDate);
-                                            }
-                                          });
-                                        },
-                                        child: Row(
-                                          children: [
-                                            Flexible(
-                                              child: TextFormField(
-                                                enabled: false,
-                                                style: const TextStyle(
-                                                  fontFamily: "Avenir LT Std",
-                                                  color: Color(0xFF000000),
-                                                  fontSize: 20,
-                                                ),
-                                                decoration:
-                                                    const InputDecoration(
-                                                  labelText:
-                                                      "Year of Diagnosis",
-                                                  labelStyle: TextStyle(
-                                                    fontFamily: "Avenir LT Std",
-                                                    color: Color(0xFFB8B8B8),
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                                keyboardType:
-                                                    TextInputType.name,
-                                                controller: yearController,
-                                                validator: (value) {
-                                                  if (value == null ||
-                                                      value.isEmpty) {
-                                                    return 'Please Enter Year';
-                                                  }
-                                                  return null;
-                                                },
                                               ),
                                             ),
                                             const SizedBox(
-                                              width: 50,
+                                              width: 10,
                                             ),
                                             Flexible(
-                                              child: InkWell(
+                                              child: Switch(
+                                                onChanged: (asc) {
+                                                  if (hide_date_of_birth ==
+                                                      true) {
+                                                    setState(() {
+                                                      hide_date_of_birth =
+                                                          false;
+                                                    });
+                                                    print(
+                                                        'Switch Button is OFF');
+                                                  } else {
+                                                    setState(() {
+                                                      hide_date_of_birth = true;
+                                                    });
+                                                    print(
+                                                        'Switch Button is ON');
+                                                  }
+                                                },
+                                                value: hide_date_of_birth,
+                                                activeColor:
+                                                    const Color(0xFF4682B4),
+                                                activeTrackColor:
+                                                    const Color(0xFF4682B4),
+                                                inactiveThumbColor: Colors.grey,
+                                                inactiveTrackColor: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      SizedBox(
+                                        width: size.width,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                                height: 100,
+                                                width: size.width * .75,
+                                                alignment: Alignment.topLeft,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text(
+                                                      "Phone",
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            "Avenir LT Std",
+                                                        color:
+                                                            Color(0xFFB8B8B8),
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                    IntlPhoneField(
+                                                      decoration:
+                                                          const InputDecoration(
+                                                        counterStyle: TextStyle(
+                                                            fontSize: 0),
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  width: 20),
+                                                        ),
+                                                      ),
+                                                      initialCountryCode:
+                                                          countrycode,
+                                                      initialValue: numb,
+                                                      onChanged: (phone) {
+                                                        countrycode = phone
+                                                            .countryISOCode
+                                                            .toString();
+                                                        numb = phone.number
+                                                            .toString();
+                                                      },
+                                                    ),
+                                                  ],
+                                                )),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Flexible(
+                                              child: Switch(
+                                                onChanged: (asc) {
+                                                  if (hide_phone == true) {
+                                                    setState(() {
+                                                      hide_phone = false;
+                                                    });
+                                                    print(
+                                                        'Switch Button is OFF');
+                                                  } else {
+                                                    setState(() {
+                                                      hide_phone = true;
+                                                    });
+                                                    print(
+                                                        'Switch Button is ON');
+                                                  }
+                                                },
+                                                value: hide_phone,
+                                                activeColor:
+                                                    const Color(0xFF4682B4),
+                                                activeTrackColor:
+                                                    const Color(0xFF4682B4),
+                                                inactiveThumbColor: Colors.grey,
+                                                inactiveTrackColor: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 16,
+                                      ),
+                                      const Text(
+                                        "Disease Information",
+                                        style: TextStyle(
+                                          fontFamily: "Avenir LT Std",
+                                          color: Color(0xFF4682B4),
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: size.width,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: size.width * .75,
+                                              alignment: Alignment.center,
+                                              child: GestureDetector(
                                                 onTap: () async {
                                                   await showDatePicker(
                                                     context: context,
@@ -864,397 +883,511 @@ class _EditPageState extends State<EditPage> {
                                                     }
                                                   });
                                                 },
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 10),
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                                  .all(
-                                                              Radius.circular(
-                                                                  4)),
-                                                      boxShadow: <BoxShadow>[
-                                                        BoxShadow(
-                                                            color: const Color(
-                                                                    0xffB8B8B8)
-                                                                .withAlpha(100),
-                                                            offset:
-                                                                const Offset(
-                                                                    0, 4),
-                                                            blurRadius: 8,
-                                                            spreadRadius: 2)
-                                                      ],
-                                                      color: Colors.white),
-                                                  child: const Text(
-                                                    'Select',
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          "Avenir LT Std",
-                                                      color: Color(0xFF4682B4),
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                child: Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: TextFormField(
+                                                        enabled: false,
+                                                        style: const TextStyle(
+                                                          fontFamily:
+                                                              "Avenir LT Std",
+                                                          color:
+                                                              Color(0xFF000000),
+                                                          fontSize: 20,
+                                                        ),
+                                                        decoration:
+                                                            const InputDecoration(
+                                                          labelText:
+                                                              "Year of Diagnosis",
+                                                          labelStyle: TextStyle(
+                                                            fontFamily:
+                                                                "Avenir LT Std",
+                                                            color: Color(
+                                                                0xFFB8B8B8),
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                        keyboardType:
+                                                            TextInputType.name,
+                                                        controller:
+                                                            yearController,
+                                                        validator: (value) {
+                                                          if (value == null ||
+                                                              value.isEmpty) {
+                                                            return 'Please Enter Year';
+                                                          }
+                                                          return null;
+                                                        },
+                                                      ),
                                                     ),
-                                                  ),
+                                                    const SizedBox(
+                                                      width: 50,
+                                                    ),
+                                                    Flexible(
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          await showDatePicker(
+                                                            context: context,
+                                                            initialDate:
+                                                                DateTime.now(),
+                                                            firstDate:
+                                                                DateTime(1900),
+                                                            lastDate:
+                                                                DateTime(2025),
+                                                          ).then(
+                                                              (selectedDate) {
+                                                            if (selectedDate !=
+                                                                null) {
+                                                              sentyear = DateTime.parse(
+                                                                      selectedDate
+                                                                          .toString())
+                                                                  .toString();
+                                                              yearController
+                                                                  .text = DateFormat(
+                                                                      "dd-MM-yyyy")
+                                                                  .format(
+                                                                      selectedDate);
+                                                            }
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  vertical: 10),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  borderRadius:
+                                                                      const BorderRadius
+                                                                              .all(
+                                                                          Radius.circular(
+                                                                              4)),
+                                                                  boxShadow: <
+                                                                      BoxShadow>[
+                                                                    BoxShadow(
+                                                                        color: const Color(0xffB8B8B8).withAlpha(
+                                                                            100),
+                                                                        offset: const Offset(
+                                                                            0,
+                                                                            4),
+                                                                        blurRadius:
+                                                                            8,
+                                                                        spreadRadius:
+                                                                            2)
+                                                                  ],
+                                                                  color: Colors
+                                                                      .white),
+                                                          child: const Text(
+                                                            'Select',
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  "Avenir LT Std",
+                                                              color: Color(
+                                                                  0xFF4682B4),
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
                                                 ),
                                               ),
-                                            )
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Flexible(
+                                              child: Switch(
+                                                onChanged: (asc) {
+                                                  if (hide_year_of_diagnosis ==
+                                                      true) {
+                                                    setState(() {
+                                                      hide_year_of_diagnosis =
+                                                          false;
+                                                    });
+                                                    print(
+                                                        'Switch Button is OFF');
+                                                  } else {
+                                                    setState(() {
+                                                      hide_year_of_diagnosis =
+                                                          true;
+                                                    });
+                                                    print(
+                                                        'Switch Button is ON');
+                                                  }
+                                                },
+                                                value: hide_year_of_diagnosis,
+                                                activeColor:
+                                                    const Color(0xFF4682B4),
+                                                activeTrackColor:
+                                                    const Color(0xFF4682B4),
+                                                inactiveThumbColor: Colors.grey,
+                                                inactiveTrackColor: Colors.grey,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Switch(
-                                        onChanged: (asc) {
-                                          if (hide_year_of_diagnosis == true) {
-                                            setState(() {
-                                              hide_year_of_diagnosis = false;
-                                            });
-                                            print('Switch Button is OFF');
-                                          } else {
-                                            setState(() {
-                                              hide_year_of_diagnosis = true;
-                                            });
-                                            print('Switch Button is ON');
-                                          }
-                                        },
-                                        value: hide_year_of_diagnosis,
-                                        activeColor: const Color(0xFF4682B4),
-                                        activeTrackColor:
-                                            const Color(0xFF4682B4),
-                                        inactiveThumbColor: Colors.grey,
-                                        inactiveTrackColor: Colors.grey,
+                                      const SizedBox(
+                                        height: 10,
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(
+                                        width: size.width,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: size.width * .75,
+                                              alignment: Alignment.center,
+                                              child: TextFormField(
+                                                style: const TextStyle(
+                                                  fontFamily: "Avenir LT Std",
+                                                  color: Color(0xFF000000),
+                                                  fontSize: 20,
+                                                ),
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: "Hospital",
+                                                  labelStyle: TextStyle(
+                                                    fontFamily: "Avenir LT Std",
+                                                    color: Color(0xFFB8B8B8),
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                keyboardType:
+                                                    TextInputType.name,
+                                                controller: hospitalController,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please Enter Hospital';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Flexible(
+                                              child: Switch(
+                                                onChanged: (asc) {
+                                                  if (hide_hospital == true) {
+                                                    setState(() {
+                                                      hide_hospital = false;
+                                                    });
+                                                    print(
+                                                        'Switch Button is OFF');
+                                                  } else {
+                                                    setState(() {
+                                                      hide_hospital = true;
+                                                    });
+                                                    print(
+                                                        'Switch Button is ON');
+                                                  }
+                                                },
+                                                value: hide_hospital,
+                                                activeColor:
+                                                    const Color(0xFF4682B4),
+                                                activeTrackColor:
+                                                    const Color(0xFF4682B4),
+                                                inactiveThumbColor: Colors.grey,
+                                                inactiveTrackColor: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      SizedBox(
+                                        width: size.width,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: size.width * .75,
+                                              alignment: Alignment.center,
+                                              child: TextFormField(
+                                                style: const TextStyle(
+                                                  fontFamily: "Avenir LT Std",
+                                                  color: Color(0xFF000000),
+                                                  fontSize: 20,
+                                                ),
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: "Medications",
+                                                  labelStyle: TextStyle(
+                                                    fontFamily: "Avenir LT Std",
+                                                    color: Color(0xFFB8B8B8),
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                keyboardType:
+                                                    TextInputType.emailAddress,
+                                                controller:
+                                                    medicationController,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please Enter Medications';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Flexible(
+                                              child: Switch(
+                                                onChanged: (asc) {
+                                                  if (hide_medications ==
+                                                      true) {
+                                                    setState(() {
+                                                      hide_medications = false;
+                                                    });
+                                                    print(
+                                                        'Switch Button is OFF');
+                                                  } else {
+                                                    setState(() {
+                                                      hide_medications = true;
+                                                    });
+                                                    print(
+                                                        'Switch Button is ON');
+                                                  }
+                                                },
+                                                value: hide_medications,
+                                                activeColor:
+                                                    const Color(0xFF4682B4),
+                                                activeTrackColor:
+                                                    const Color(0xFF4682B4),
+                                                inactiveThumbColor: Colors.grey,
+                                                inactiveTrackColor: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      SizedBox(
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: size.width * .75,
+                                              alignment: Alignment.center,
+                                              child: TextFormField(
+                                                style: const TextStyle(
+                                                  fontFamily: "Avenir LT Std",
+                                                  color: Color(0xFF000000),
+                                                  fontSize: 20,
+                                                ),
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: "Doctor",
+                                                  labelStyle: TextStyle(
+                                                    fontFamily: "Avenir LT Std",
+                                                    color: Color(0xFFB8B8B8),
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                keyboardType:
+                                                    TextInputType.emailAddress,
+                                                controller: doctorController,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please Enter Doctor';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Flexible(
+                                              child: Switch(
+                                                onChanged: (asc) {
+                                                  if (hide_doctor == true) {
+                                                    setState(() {
+                                                      hide_doctor = false;
+                                                    });
+                                                    print(
+                                                        'Switch Button is OFF');
+                                                  } else {
+                                                    setState(() {
+                                                      hide_doctor = true;
+                                                    });
+                                                    print(
+                                                        'Switch Button is ON');
+                                                  }
+                                                },
+                                                value: hide_doctor,
+                                                activeColor:
+                                                    const Color(0xFF4682B4),
+                                                activeTrackColor:
+                                                    const Color(0xFF4682B4),
+                                                inactiveThumbColor: Colors.grey,
+                                                inactiveTrackColor: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 30,
+                                      ),
+                                      isButtonLoading
+                                          ? const Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.green,
+                                              ),
+                                            )
+                                          : InkWell(
+                                              onTap: () async {
+                                                setState(() {
+                                                  isButtonLoading = true;
+                                                });
+                                                message = {
+                                                  'name': nameController.text
+                                                      .toString(),
+                                                  'gender': gender.toString(),
+                                                  'country_code':
+                                                      countrycode.toString(),
+                                                  'phone': numb.toString(),
+                                                  'hospital': hospitalController
+                                                      .text
+                                                      .toString(),
+                                                  'medications':
+                                                      medicationController.text
+                                                          .toString(),
+                                                  'physician': doctorController
+                                                      .text
+                                                      .toString(),
+                                                  "hide_email":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_email
+                                                                  .toString())
+                                                          .toString(),
+                                                  "hide_gender":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_gender
+                                                                  .toString())
+                                                          .toString(),
+                                                  "hide_date_of_birth":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_date_of_birth
+                                                                  .toString())
+                                                          .toString(),
+                                                  "hide_phone":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_phone
+                                                                  .toString())
+                                                          .toString(),
+                                                  "hide_support_group":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_support_group
+                                                                  .toString())
+                                                          .toString(),
+                                                  "hide_condition":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_condition
+                                                                  .toString())
+                                                          .toString(),
+                                                  "hide_year_of_diagnosis":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_year_of_diagnosis
+                                                                  .toString())
+                                                          .toString(),
+                                                  "hide_hospital":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_hospital
+                                                                  .toString())
+                                                          .toString(),
+                                                  "hide_medications":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_medications
+                                                                  .toString())
+                                                          .toString(),
+                                                  "hide_doctor":
+                                                      toBeginningOfSentenceCase(
+                                                              hide_doctor
+                                                                  .toString())
+                                                          .toString(),
+                                                };
+                                                if (sentdate.isNotEmpty) {
+                                                  message['date_of_birth'] =
+                                                      sentdate.toString();
+                                                }
+                                                if (sentyear.isNotEmpty) {
+                                                  message['year_of_diagnosis'] =
+                                                      sentyear.toString();
+                                                }
+                                                await edit(context, message);
+                                                setState(() {
+                                                  isButtonLoading = false;
+                                                });
+                                              },
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 13),
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(4)),
+                                                    boxShadow: <BoxShadow>[
+                                                      BoxShadow(
+                                                          color: const Color(
+                                                                  0xffB8B8B8)
+                                                              .withAlpha(100),
+                                                          offset: const Offset(
+                                                              0, 4),
+                                                          blurRadius: 8,
+                                                          spreadRadius: 2)
+                                                    ],
+                                                    color: const Color(
+                                                        0xFF71B48D)),
+                                                child: const Text(
+                                                  'SAVE',
+                                                  style: TextStyle(
+                                                    fontFamily: "Avenir LT Std",
+                                                    color: Colors.white,
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              SizedBox(
-                                width: size.width,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: size.width * .75,
-                                      alignment: Alignment.center,
-                                      child: TextFormField(
-                                        style: const TextStyle(
-                                          fontFamily: "Avenir LT Std",
-                                          color: Color(0xFF000000),
-                                          fontSize: 20,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          labelText: "Hospital",
-                                          labelStyle: TextStyle(
-                                            fontFamily: "Avenir LT Std",
-                                            color: Color(0xFFB8B8B8),
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.name,
-                                        controller: hospitalController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please Enter Hospital';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Switch(
-                                        onChanged: (asc) {
-                                          if (hide_hospital == true) {
-                                            setState(() {
-                                              hide_hospital = false;
-                                            });
-                                            print('Switch Button is OFF');
-                                          } else {
-                                            setState(() {
-                                              hide_hospital = true;
-                                            });
-                                            print('Switch Button is ON');
-                                          }
-                                        },
-                                        value: hide_hospital,
-                                        activeColor: const Color(0xFF4682B4),
-                                        activeTrackColor:
-                                            const Color(0xFF4682B4),
-                                        inactiveThumbColor: Colors.grey,
-                                        inactiveTrackColor: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              SizedBox(
-                                width: size.width,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: size.width * .75,
-                                      alignment: Alignment.center,
-                                      child: TextFormField(
-                                        style: const TextStyle(
-                                          fontFamily: "Avenir LT Std",
-                                          color: Color(0xFF000000),
-                                          fontSize: 20,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          labelText: "Medications",
-                                          labelStyle: TextStyle(
-                                            fontFamily: "Avenir LT Std",
-                                            color: Color(0xFFB8B8B8),
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                        controller: medicationController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please Enter Medications';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Switch(
-                                        onChanged: (asc) {
-                                          if (hide_medications == true) {
-                                            setState(() {
-                                              hide_medications = false;
-                                            });
-                                            print('Switch Button is OFF');
-                                          } else {
-                                            setState(() {
-                                              hide_medications = true;
-                                            });
-                                            print('Switch Button is ON');
-                                          }
-                                        },
-                                        value: hide_medications,
-                                        activeColor: const Color(0xFF4682B4),
-                                        activeTrackColor:
-                                            const Color(0xFF4682B4),
-                                        inactiveThumbColor: Colors.grey,
-                                        inactiveTrackColor: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              SizedBox(
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: size.width * .75,
-                                      alignment: Alignment.center,
-                                      child: TextFormField(
-                                        style: const TextStyle(
-                                          fontFamily: "Avenir LT Std",
-                                          color: Color(0xFF000000),
-                                          fontSize: 20,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          labelText: "Doctor",
-                                          labelStyle: TextStyle(
-                                            fontFamily: "Avenir LT Std",
-                                            color: Color(0xFFB8B8B8),
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                        controller: doctorController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please Enter Doctor';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Flexible(
-                                      child: Switch(
-                                        onChanged: (asc) {
-                                          if (hide_doctor == true) {
-                                            setState(() {
-                                              hide_doctor = false;
-                                            });
-                                            print('Switch Button is OFF');
-                                          } else {
-                                            setState(() {
-                                              hide_doctor = true;
-                                            });
-                                            print('Switch Button is ON');
-                                          }
-                                        },
-                                        value: hide_doctor,
-                                        activeColor: const Color(0xFF4682B4),
-                                        activeTrackColor:
-                                            const Color(0xFF4682B4),
-                                        inactiveThumbColor: Colors.grey,
-                                        inactiveTrackColor: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 30,
-                              ),
-                              isButtonLoading
-                                  ? const Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.green,
-                                      ),
-                                    )
-                                  : InkWell(
-                                      onTap: () async {
-                                        setState(() {
-                                          isButtonLoading = true;
-                                        });
-                                        message = {
-                                          'name':
-                                              nameController.text.toString(),
-                                          'gender': gender.toString(),
-                                          'country_code':
-                                              countrycode.toString(),
-                                          'phone': numb.toString(),
-                                          'hospital': hospitalController.text
-                                              .toString(),
-                                          'medications': medicationController
-                                              .text
-                                              .toString(),
-                                          'physician':
-                                              doctorController.text.toString(),
-                                          "hide_email":
-                                              toBeginningOfSentenceCase(
-                                                      hide_email.toString())
-                                                  .toString(),
-                                          "hide_gender":
-                                              toBeginningOfSentenceCase(
-                                                      hide_gender.toString())
-                                                  .toString(),
-                                          "hide_date_of_birth":
-                                              toBeginningOfSentenceCase(
-                                                      hide_date_of_birth
-                                                          .toString())
-                                                  .toString(),
-                                          "hide_phone":
-                                              toBeginningOfSentenceCase(
-                                                      hide_phone.toString())
-                                                  .toString(),
-                                          "hide_support_group":
-                                              toBeginningOfSentenceCase(
-                                                      hide_support_group
-                                                          .toString())
-                                                  .toString(),
-                                          "hide_condition":
-                                              toBeginningOfSentenceCase(
-                                                      hide_condition.toString())
-                                                  .toString(),
-                                          "hide_year_of_diagnosis":
-                                              toBeginningOfSentenceCase(
-                                                      hide_year_of_diagnosis
-                                                          .toString())
-                                                  .toString(),
-                                          "hide_hospital":
-                                              toBeginningOfSentenceCase(
-                                                      hide_hospital.toString())
-                                                  .toString(),
-                                          "hide_medications":
-                                              toBeginningOfSentenceCase(
-                                                      hide_medications
-                                                          .toString())
-                                                  .toString(),
-                                          "hide_doctor":
-                                              toBeginningOfSentenceCase(
-                                                      hide_doctor.toString())
-                                                  .toString(),
-                                        };
-                                        if (sentdate.isNotEmpty) {
-                                          message['date_of_birth'] =
-                                              sentdate.toString();
-                                        }
-                                        if (sentyear.isNotEmpty) {
-                                          message['year_of_diagnosis'] =
-                                              sentyear.toString();
-                                        }
-                                        await edit(context, message);
-                                        setState(() {
-                                          isButtonLoading = false;
-                                        });
-                                      },
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 13),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(4)),
-                                            boxShadow: <BoxShadow>[
-                                              BoxShadow(
-                                                  color: const Color(0xffB8B8B8)
-                                                      .withAlpha(100),
-                                                  offset: const Offset(0, 4),
-                                                  blurRadius: 8,
-                                                  spreadRadius: 2)
-                                            ],
-                                            color: const Color(0xFF71B48D)),
-                                        child: const Text(
-                                          'SAVE',
-                                          style: TextStyle(
-                                            fontFamily: "Avenir LT Std",
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              const SizedBox(
-                                height: 20,
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-    );
+                      );
+                    }),
+            ));
   }
 }
 

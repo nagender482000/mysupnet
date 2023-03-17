@@ -88,7 +88,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       year = "";
     }
     return Scaffold(
-      endDrawer: const NavigationDrawerWidget(),
       backgroundColor: Colors.white,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

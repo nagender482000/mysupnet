@@ -14,7 +14,9 @@ profilepic(file) async {
 
   http.StreamedResponse response = await request.send();
   if (response.statusCode == 200) {
-    Fluttertoast.showToast(msg: "Uploaded.");
+    return 0;
   } else {
+    Fluttertoast.showToast(msg: "Try Again.");
+    return 1;
   }
 }

@@ -15,7 +15,9 @@ class FeedProvider extends ChangeNotifier {
   FeedData? feed;
   bool isloading = true;
   bool iscommenting = false;
-
+  String userEmail = "";
+  String userImg = "";
+  String userName = "";
   getpost() async {
     isloading = true;
     var data = await postlist();
@@ -41,10 +43,13 @@ class FeedProvider extends ChangeNotifier {
     final responseData = json.decode(responsed.body);
     if (response.statusCode == 200) {
       var userdata = responseData["data"];
-      String userimg = userdata["photo"].toString();
+      userImg = userdata["photo"].toString();
+      userName = userdata["name"].toString();
+      userEmail = userdata["email"].toString();
 
-      prefs.setString('img', userimg);
+      prefs.setString('img', userImg);
     }
+    notifyListeners();
   }
 
   void postLike(String id, index) async {

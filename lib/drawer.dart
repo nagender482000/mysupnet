@@ -1,17 +1,22 @@
 import 'dart:collection';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mysupnet/Apicalls/logout.dart';
-import 'package:mysupnet/global.dart';
 import 'package:mysupnet/profile/profile.dart';
 import 'package:mysupnet/splashscreen/soon.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NavigationDrawerWidget extends StatefulWidget {
-  const NavigationDrawerWidget({Key? key}) : super(key: key);
+  final String userEmail;
+  final Widget userImg;
+  final String userName;
+  const NavigationDrawerWidget(
+      {Key? key,
+      required this.userEmail,
+      required this.userImg,
+      required this.userName})
+      : super(key: key);
 
   @override
   State<NavigationDrawerWidget> createState() => _NavigationDrawerWidgetState();
@@ -22,12 +27,6 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   bool isloading = true;
   bool viewVisible = true;
   LinkedHashMap<String, dynamic> userdata = LinkedHashMap();
-  String uname = "";
-
-  String uemail = "";
-
-  String uimg = "";
-  String userimg = "";
 
   int likecount = 0;
   int commentscount = 0;
@@ -41,37 +40,18 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
     }
   }
 
-  profile() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    uimg = prefs.getString('img').toString();
-
-    uname = prefs.getString('name').toString();
-    uemail = prefs.getString('email').toString();
-  }
-
   @override
   void initState() {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
     ));
-    getuser();
     super.initState();
-  }
-
-  getuser() async {
-    setState(() {
-      isloading = true;
-    });
-    await profile();
-    setState(() {
-      isloading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    String name = uname;
-    String email = uemail;
+    String name = widget.userName;
+    String email = widget.userEmail;
 
     Size size = MediaQuery.of(context).size;
     return Drawer(
@@ -89,12 +69,13 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                     height: size.height * 0.05,
                   ),
                   buildHeader(
-                    name: name,
-                    email: email,
-                    onClicked: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const ProfileScreen())),
-                  ),
+                      name: name,
+                      email: email,
+                      onClicked: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ProfileScreen()));
+                      }),
                   SizedBox(
                     height: size.height * 0.05,
                   ),
@@ -105,31 +86,51 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                         buildMenuItem(
                           text: 'SETTINGS',
                           licon: Icons.settings,
-                          onClicked: () => selectedItem(context, 0),
+                          onClicked: () {
+                            Navigator.of(context).pop();
+
+                            selectedItem(context, 0);
+                          },
                         ),
                         const SizedBox(height: 16),
                         buildMenuItem(
                           text: 'RESOURCES',
                           licon: Icons.support,
-                          onClicked: () => selectedItem(context, 1),
+                          onClicked: () {
+                            Navigator.of(context).pop();
+
+                            selectedItem(context, 1);
+                          },
                         ),
                         const SizedBox(height: 16),
                         buildMenuItem(
                           text: 'TECH HELP',
                           licon: Icons.question_answer,
-                          onClicked: () => selectedItem(context, 2),
+                          onClicked: () {
+                            Navigator.of(context).pop();
+
+                            selectedItem(context, 2);
+                          },
                         ),
                         const SizedBox(height: 16),
                         buildMenuItem(
                           text: 'MYSUPNET.ORG',
                           licon: Icons.info,
-                          onClicked: () => selectedItem(context, 3),
+                          onClicked: () {
+                            Navigator.of(context).pop();
+
+                            selectedItem(context, 3);
+                          },
                         ),
                         const SizedBox(height: 16),
                         buildMenuItem(
                           text: 'LOGOUT',
                           licon: Icons.logout,
-                          onClicked: () => selectedItem(context, 4),
+                          onClicked: () {
+                            Navigator.of(context).pop();
+
+                            selectedItem(context, 4);
+                          },
                         ),
                       ],
                     ),
@@ -184,36 +185,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                 ],
               ),
               const SizedBox(width: 20),
-              Flexible(
-                  child: CachedNetworkImage(
-                imageUrl: baseurl + uimg.toString(),
-                imageBuilder: (context, imageProvider) => Container(
-                  width: 80.0,
-                  height: 80.0,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: imageProvider, fit: BoxFit.cover),
-                  ),
-                ),
-                placeholder: (context, url) => const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-                errorWidget: (context, url, error) => const CircleAvatar(
-                  radius: 31,
-                  backgroundColor: Colors.white,
-                  child: CircleAvatar(
-                      radius: 30,
-                      backgroundImage: AssetImage(
-                        "assets/images/user.png",
-                      )),
-                ),
-              )),
+              Flexible(child: widget.userImg),
             ],
           ),
         ),
@@ -245,8 +217,6 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   }
 
   void selectedItem(BuildContext context, int index) {
-    Navigator.of(context).pop();
-
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(

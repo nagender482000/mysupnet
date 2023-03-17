@@ -32,9 +32,7 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
 
   List<String> clist = ["drop.png", "edit.jpg", "delete.jpg"];
   List<String> flist = ["drop.png", "flag.jpg"];
-  String name = "";
-  String email = "";
-  String uimg = "";
+
   @override
   void initState() {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -45,13 +43,6 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
   }
 
   setpost() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    uimg = prefs.getString('img').toString();
-    name = prefs.getString('name').toString();
-
-    email = prefs.getString('email').toString();
-    print(baseurl + uimg.toString());
-
     final feedModel = Provider.of<FeedProvider>(context, listen: false);
 
     feedModel.getpost();
@@ -67,14 +58,44 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Consumer<FeedProvider>(
-      builder: (context, feedModel, _) => Scaffold(
-        endDrawer: const NavigationDrawerWidget(),
-        backgroundColor: Colors.white,
-        body: feedModel.isloading
-            ? const Center(
+      builder: (context, feedModel, _) => feedModel.isloading
+          ? const Scaffold(
+              body: Center(
                 child: CircularProgressIndicator(),
-              )
-            : SizedBox(
+              ),
+            )
+          : Scaffold(
+              endDrawer: NavigationDrawerWidget(
+                userEmail: feedModel.userEmail,
+                userName: feedModel.userName,
+                userImg: CachedNetworkImage(
+                  imageUrl: baseurl + feedModel.userImg.toString(),
+                  imageBuilder: (context, imageProvider) => Container(
+                    width: 80.0,
+                    height: 80.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: imageProvider, fit: BoxFit.cover),
+                    ),
+                  ),
+                  placeholder: (context, url) => const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => const CircleAvatar(
+                      radius: 25,
+                      backgroundImage: AssetImage(
+                        "assets/images/user.png",
+                      )),
+                ),
+              ),
+              backgroundColor: Colors.white,
+              body: SizedBox(
                 height: size.height * 1.2,
                 child: SingleChildScrollView(
                   child: Column(
@@ -97,7 +118,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                     builder: (context) => AddNewPost(
                                         isEditPost: false,
                                         img: CachedNetworkImage(
-                                          imageUrl: baseurl + uimg.toString(),
+                                          imageUrl: baseurl +
+                                              feedModel.userImg.toString(),
                                           imageBuilder:
                                               (context, imageProvider) =>
                                                   Container(
@@ -126,8 +148,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                                     "assets/images/user.png",
                                                   )),
                                         ),
-                                        name: name,
-                                        email: email),
+                                        name: feedModel.userName,
+                                        email: feedModel.userName),
                                   ));
                                 },
                                 child: SizedBox(
@@ -139,7 +161,8 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       CachedNetworkImage(
-                                        imageUrl: baseurl + uimg.toString(),
+                                        imageUrl: baseurl +
+                                            feedModel.userImg.toString(),
                                         imageBuilder:
                                             (context, imageProvider) =>
                                                 Container(
@@ -240,9 +263,9 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                                                                   .toString())
                                                               .toString()),
                                                       feedModel,
-                                                      name,
-                                                      email,
-                                                      uimg),
+                                                      feedModel.userName,
+                                                      feedModel.userEmail,
+                                                      feedModel.userImg),
                                                 ])
                                               ])));
                                     },
@@ -257,55 +280,55 @@ class _HomeFeedPageState extends State<HomeFeedPage> {
                   ),
                 ),
               ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 0,
-          items: [
-            BottomNavigationBarItem(
-              icon: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const HomeFeedPage(),
-                  ));
-                },
-                child: const Image(
-                  image: AssetImage("assets/images/feed.png"),
-                  color: null,
-                ),
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: 0,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => const HomeFeedPage(),
+                        ));
+                      },
+                      child: const Image(
+                        image: AssetImage("assets/images/feed.png"),
+                        color: null,
+                      ),
+                    ),
+                    backgroundColor: null,
+                    label: "FEED",
+                  ),
+                  BottomNavigationBarItem(
+                    icon: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const DisplayPage(),
+                        ));
+                      },
+                      child: const Image(
+                        image: AssetImage("assets/images/inactivechat.png"),
+                        color: null,
+                      ),
+                    ),
+                    label: "MENTORS",
+                  ),
+                  BottomNavigationBarItem(
+                    icon: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const DisplayPage(),
+                        ));
+                      },
+                      child: const Image(
+                        image: AssetImage("assets/images/inactivenew.png"),
+                        color: null,
+                      ),
+                    ),
+                    label: "WHAT'S NEW",
+                  ),
+                ],
               ),
-              backgroundColor: null,
-              label: "FEED",
             ),
-            BottomNavigationBarItem(
-              icon: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const DisplayPage(),
-                  ));
-                },
-                child: const Image(
-                  image: AssetImage("assets/images/inactivechat.png"),
-                  color: null,
-                ),
-              ),
-              label: "MENTORS",
-            ),
-            BottomNavigationBarItem(
-              icon: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const DisplayPage(),
-                  ));
-                },
-                child: const Image(
-                  image: AssetImage("assets/images/inactivenew.png"),
-                  color: null,
-                ),
-              ),
-              label: "WHAT'S NEW",
-            ),
-          ],
-        ),
-      ),
     );
   }
 
