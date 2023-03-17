@@ -31,10 +31,15 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   int likecount = 0;
   int commentscount = 0;
   _sendMail() async {
-    // Android and iOS
-    const uri = 'mailto:mkpsg@mysupnet.org?subject=Help&body=I%20need%20help!';
-    if (await canLaunchUrl(Uri.parse(uri))) {
-      await launchUrl(Uri.parse(uri));
+    final Uri params = Uri(
+      scheme: 'mailto',
+      path: 'mkpsg@mysupnet.org',
+      query: 'subject=Help &body=I need your help!', //add subject and body here
+    );
+
+    var uri = params.toString();
+    if (await canLaunch(uri)) {
+      await launch(uri);
     } else {
       throw 'Could not launch $uri';
     }

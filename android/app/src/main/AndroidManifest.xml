@@ -24,7 +24,7 @@
 </queries>
    <application
         android:label="MySupNet"
-        android:icon="@mipmap/logo">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

@@ -150,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      userdata["name"].toString(),
+                                      userdata["name"] ?? "",
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         fontFamily: "Avenir LT Std",
@@ -160,9 +160,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     ),
                                     Text(
-                                      userdata["gender"].toString() +
-                                          "," +
-                                          userdata["country_code"].toString(),
+                                      (userdata["gender"] != null
+                                              ? userdata["gender"] + ","
+                                              : "") +
+                                          (userdata["country_code"] ?? ""),
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         fontFamily: "Avenir LT Std",
@@ -197,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: 20,
                                 ),
                                 Text(
-                                  userdata["email"].toString(),
+                                  userdata["email"] ?? "",
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontFamily: "Avenir LT Std",
@@ -221,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: 20,
                                 ),
                                 Text(
-                                  userdata["phone"].toString(),
+                                  userdata["phone"] ?? "",
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontFamily: "Avenir LT Std",
@@ -249,7 +250,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               height: 20,
                             ),
                             Text(
-                              userdata["disease"].toString(),
+                              userdata["disease"] ?? "",
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontFamily: "Avenir LT Std",
@@ -318,7 +319,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               height: 10,
                             ),
                             Text(
-                              userdata["hospital"].toString(),
+                              userdata["hospital"] ?? "",
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontFamily: "Avenir LT Std",
@@ -341,7 +342,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               height: 10,
                             ),
                             Text(
-                              userdata["medications"].toString(),
+                              userdata["medications"] ?? "",
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontFamily: "Avenir LT Std",
@@ -364,7 +365,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               height: 10,
                             ),
                             Text(
-                              userdata["physician"].toString(),
+                              userdata["physician"] ?? "",
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontFamily: "Avenir LT Std",

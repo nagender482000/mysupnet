@@ -38,7 +38,7 @@ dependencies:
   intl_phone_field: 3.1.0
   shared_preferences: 2.0.18 
   intl: 0.18.0
-  url_launcher: 6.1.10
+  url_launcher: 6.0.18
   dropdown_button2: 1.0.7
   file_picker: 5.2.6
   pinput: 2.2.31
@@ -58,6 +58,15 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
+  flutter_launcher_icons: "^0.12.0"
+
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/appLogo.jpg"
+  min_sdk_android: 16
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

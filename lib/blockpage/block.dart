@@ -19,8 +19,15 @@ class _BlockPageState extends State<BlockPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     String email = prefs.getString('email').toString();
-    String uri =
-        'mailto:mkpsg@mysupnet.org?subject=Approve Account,&body=Hello, I have signed up with $email and would like to get access to the support group. Please approve my account. \n Thanks';
+
+    final Uri params = Uri(
+      scheme: 'mailto',
+      path: 'mkpsg@mysupnet.org',
+      query:
+          'subject=Approve Account & body=Hello, I have signed up with $email and would like to get access to the support group. Please approve my account. \n Thanks', //add subject and body here
+    );
+
+    var uri = params.toString();
     if (await canLaunch(uri)) {
       await launch(uri);
     } else {
