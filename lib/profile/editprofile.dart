@@ -377,7 +377,7 @@ class _EditPageState extends State<EditPage> {
                                               child: Column(
                                                 children: [
                                                   const Text(
-                                                    "Visble to all?",
+                                                    "Visible to all?",
                                                     style: TextStyle(
                                                       fontFamily:
                                                           "Avenir LT Std",
@@ -464,7 +464,7 @@ class _EditPageState extends State<EditPage> {
                                                         'Switch Button is ON');
                                                   }
                                                 },
-                                                value: hide_email,
+                                                value: !hide_email,
                                                 activeColor:
                                                     const Color(0xFF4682B4),
                                                 activeTrackColor:
@@ -568,7 +568,7 @@ class _EditPageState extends State<EditPage> {
                                                         'Switch Button is ON');
                                                   }
                                                 },
-                                                value: hide_gender,
+                                                value: !hide_gender,
                                                 activeColor:
                                                     const Color(0xFF4682B4),
                                                 activeTrackColor:
@@ -750,7 +750,7 @@ class _EditPageState extends State<EditPage> {
                                                         'Switch Button is ON');
                                                   }
                                                 },
-                                                value: hide_date_of_birth,
+                                                value: !hide_date_of_birth,
                                                 activeColor:
                                                     const Color(0xFF4682B4),
                                                 activeTrackColor:
@@ -832,7 +832,7 @@ class _EditPageState extends State<EditPage> {
                                                         'Switch Button is ON');
                                                   }
                                                 },
-                                                value: hide_phone,
+                                                value: !hide_phone,
                                                 activeColor:
                                                     const Color(0xFF4682B4),
                                                 activeTrackColor:
@@ -1026,7 +1026,7 @@ class _EditPageState extends State<EditPage> {
                                                         'Switch Button is ON');
                                                   }
                                                 },
-                                                value: hide_year_of_diagnosis,
+                                                value: !hide_year_of_diagnosis,
                                                 activeColor:
                                                     const Color(0xFF4682B4),
                                                 activeTrackColor:
@@ -1095,7 +1095,7 @@ class _EditPageState extends State<EditPage> {
                                                         'Switch Button is ON');
                                                   }
                                                 },
-                                                value: hide_hospital,
+                                                value: !hide_hospital,
                                                 activeColor:
                                                     const Color(0xFF4682B4),
                                                 activeTrackColor:
@@ -1166,7 +1166,7 @@ class _EditPageState extends State<EditPage> {
                                                         'Switch Button is ON');
                                                   }
                                                 },
-                                                value: hide_medications,
+                                                value: !hide_medications,
                                                 activeColor:
                                                     const Color(0xFF4682B4),
                                                 activeTrackColor:
@@ -1234,7 +1234,7 @@ class _EditPageState extends State<EditPage> {
                                                         'Switch Button is ON');
                                                   }
                                                 },
-                                                value: hide_doctor,
+                                                value: !hide_doctor,
                                                 activeColor:
                                                     const Color(0xFF4682B4),
                                                 activeTrackColor:
