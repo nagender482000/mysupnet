@@ -1,4 +1,4 @@
-package com.example.untitled
+package org.mysupnet
 
 import io.flutter.embedding.android.FlutterActivity
 
