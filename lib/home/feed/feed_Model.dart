@@ -152,7 +152,7 @@ class Comment {
         userName: json["user_name"],
         userEmail: json["user_email"],
         postUuid: json["post_uuid"],
-        userPhoto: json["user_photo"] == null ? "null" : json["user_photo"],
+        userPhoto: json["user_photo"] ?? "null",
         currentUserHasLiked: json["current_user_has_liked"],
         likes: json["likes"],
       );
@@ -165,7 +165,7 @@ class Comment {
         "user_name": userName,
         "user_email": userEmail,
         "post_uuid": postUuid,
-        "user_photo": userPhoto == null ? null : userPhoto,
+        "user_photo": userPhoto,
         "current_user_has_liked": currentUserHasLiked,
         "likes": likes,
       };

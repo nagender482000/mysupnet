@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:mysupnet/Apicalls/addpost.dart';
 import 'package:mysupnet/Apicalls/editpost.dart';
-import 'package:mysupnet/drawer.dart';
 import 'package:mysupnet/home/feed/HomeFeed.dart';
 
 class AddNewPost extends StatefulWidget {

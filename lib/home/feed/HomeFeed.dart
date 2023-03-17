@@ -15,7 +15,6 @@ import 'package:mysupnet/home/newpost.dart';
 import 'package:mysupnet/home/user.dart';
 import 'package:mysupnet/splashscreen/soon.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeFeedPage extends StatefulWidget {
   const HomeFeedPage({Key? key}) : super(key: key);
